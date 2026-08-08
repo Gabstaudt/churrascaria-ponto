@@ -13,3 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 Antes de planejar ou implementar qualquer alteração, leia integralmente
 `docs/PROJECT_CONTEXT.md`. Esse arquivo registra as decisões de produto,
 arquitetura, segurança, domínio e ordem de desenvolvimento do sistema.
+
+Para planejamento e execução incremental, consulte também
+`docs/SPRINT_PLAN.md`. Não avance para uma sprint posterior sem validar as
+dependências e os critérios de aceite das anteriores.

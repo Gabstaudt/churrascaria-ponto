@@ -15,7 +15,7 @@ export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Navegação administrativa">
+    <nav className="admin-navigation" aria-label="Navegação administrativa">
       {links.map(({ href, label, icon: Icon, exact }) => {
         const active = exact ? pathname === href : pathname.startsWith(href);
         return <Link className={`nav-link${active ? " active" : ""}`} href={href} key={href}><Icon size={19} /> {label}</Link>;

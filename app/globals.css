@@ -397,11 +397,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Sprint 6: operational calendar and date exceptions */
-.calendar-page { width: 100%; max-width: 1280px; margin-inline: auto; }
+.calendar-page { width: 100%; max-width: 1180px; margin-inline: auto; }
 .calendar-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
 .calendar-heading h1 { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -.045em; }
 .calendar-heading > div > p:last-child { max-width: 42rem; margin: .65rem 0 0; color: var(--muted); line-height: 1.55; }
-.calendar-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 2rem; }
+.calendar-panel { padding: 1rem; }
+.calendar-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .calendar-view-tabs { display: inline-flex; padding: .25rem; border: 1px solid var(--line); border-radius: .75rem; background: #e9ede9; }
 .calendar-view-tabs a { min-width: 5rem; padding: .55rem .8rem; border-radius: .55rem; color: var(--muted); font-size: .8rem; font-weight: 800; text-align: center; }
 .calendar-view-tabs a.active { background: white; color: var(--brand); box-shadow: 0 2px 7px rgb(24 32 27 / 8%); }
@@ -452,7 +453,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 800px) {
-  .sidebar nav { grid-template-columns: repeat(4, 1fr); }
+  .sidebar .admin-navigation { grid-template-columns: repeat(4, 1fr); }
   .calendar-heading { align-items: stretch; flex-direction: column; gap: 1.2rem; }
   .calendar-heading .action-button { width: 100%; }
   .calendar-controls { align-items: stretch; flex-direction: column; }

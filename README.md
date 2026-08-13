@@ -12,6 +12,7 @@ ORM e Tailwind CSS. As decisões completas de produto e arquitetura estão em
 - Node.js compatível com Next.js 16;
 - npm;
 - PostgreSQL acessível por uma connection string.
+- Docker (opcional, recomendado para o PostgreSQL local).
 
 ## Configuração local
 
@@ -21,19 +22,40 @@ ORM e Tailwind CSS. As decisões completas de produto e arquitetura estão em
    npm install
    ```
 
-2. Copie o arquivo de exemplo e ajuste a conexão com seu PostgreSQL:
+2. Inicie o PostgreSQL local, caso use Docker:
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. Copie o arquivo de exemplo e ajuste a conexão e o segredo de autenticação:
 
    ```bash
    cp .env.example .env
+   openssl rand -base64 32
    ```
 
-3. Aplique as migrations existentes:
+   Copie a saída do `openssl` para `BETTER_AUTH_SECRET` no `.env`.
+
+4. Aplique as migrations existentes:
 
    ```bash
    npm run db:migrate
    ```
 
-4. Inicie o ambiente de desenvolvimento:
+5. Crie o primeiro administrador sem gravar senha no código:
+
+   ```bash
+   ADMIN_NAME="Administrador" \
+   ADMIN_EMAIL="admin@exemplo.com" \
+   ADMIN_PASSWORD="uma-senha-forte" \
+   npm run admin:create
+   ```
+
+   A senha deve ter entre 12 e 128 caracteres, com maiúscula, minúscula, número
+   e caractere especial. As variáveis acima existem somente durante o comando.
+
+6. Inicie o ambiente de desenvolvimento:
 
    ```bash
    npm run dev
@@ -54,6 +76,7 @@ A aplicação estará disponível em `http://localhost:3000`.
 | `npm run db:generate` | Gera migration a partir dos schemas |
 | `npm run db:migrate` | Aplica migrations pendentes |
 | `npm run db:studio` | Abre o Drizzle Studio |
+| `npm run admin:create` | Cria o primeiro administrador com senha em variável de ambiente |
 
 ## Banco de dados
 
@@ -66,3 +89,12 @@ A aplicação estará disponível em `http://localhost:3000`.
 
 Não edite manualmente migrations que já tenham sido aplicadas em ambientes
 compartilhados ou de produção.
+
+## Autenticação
+
+- O cadastro público está desativado.
+- Senhas são processadas pelo Better Auth e o hash fica em `accounts`.
+- `/admin` é validado no servidor e exige usuário ativo com role `ADMIN`.
+- O login possui rate limiting e retorna mensagem genérica para não revelar se
+  uma conta existe ou está inativa.
+- Login bem-sucedido e logout geram registros em `auth_audit_logs`.

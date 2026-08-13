@@ -63,3 +63,13 @@ export async function listAvailability() {
   ]);
   return { daysOff: off, swaps, vacations: vacationRows, leaves };
 }
+
+export async function getEmployeeAvailability(employeeId: string) {
+  const [off, swaps, vacationRows, leaves] = await Promise.all([
+    db.select().from(daysOff).where(eq(daysOff.employeeId, employeeId)).orderBy(desc(daysOff.date)),
+    db.select().from(dayOffSwaps).where(eq(dayOffSwaps.employeeId, employeeId)).orderBy(desc(dayOffSwaps.createdAt)),
+    db.select().from(vacations).where(eq(vacations.employeeId, employeeId)).orderBy(desc(vacations.startDate)),
+    db.select().from(leavePeriods).where(eq(leavePeriods.employeeId, employeeId)).orderBy(desc(leavePeriods.startDate)),
+  ]);
+  return { daysOff: off, swaps, vacations: vacationRows, leaves };
+}

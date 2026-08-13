@@ -3,7 +3,7 @@ import "server-only";
 import { and, asc, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
-import { auditLogs, employees, users, type EmployeeStatus } from "@/db/schema";
+import { auditLogs, employeeDocuments, employees, users, type EmployeeStatus } from "@/db/schema";
 import type { EmployeeCreateInput, EmployeeUpdateInput } from "@/validations/employee";
 
 import { mapEmployeeConflict } from "./employee-errors";
@@ -73,6 +73,11 @@ export async function createEmployee(input: EmployeeCreateInput, performedBy: st
 export async function getEmployeeById(id: string) {
   const [employee] = await db.select().from(employees).where(eq(employees.id, id)).limit(1);
   return employee;
+}
+
+export async function listEmployeeDocuments(id: string) {
+  return db.select({ id: employeeDocuments.id, title: employeeDocuments.title, type: employeeDocuments.type, fileName: employeeDocuments.fileName, contentType: employeeDocuments.contentType, createdAt: employeeDocuments.createdAt })
+    .from(employeeDocuments).where(eq(employeeDocuments.employeeId, id)).orderBy(desc(employeeDocuments.createdAt));
 }
 
 export async function getEmployeeAuditHistory(id: string) {

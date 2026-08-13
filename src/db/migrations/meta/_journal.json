@@ -29,6 +29,13 @@
       "when": 1786632938123,
       "tag": "0003_brave_hex",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786633730159,
+      "tag": "0004_aspiring_the_liberteens",
+      "breakpoints": true
     }
   ]
 }

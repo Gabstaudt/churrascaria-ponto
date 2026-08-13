@@ -1,0 +1,5 @@
+import { z } from "zod";
+
+export const timeBankPeriodSchema = z.object({ employeeId: z.uuid(), startDate: z.string().date(), endDate: z.string().date() }).refine((data) => data.endDate >= data.startDate, { message: "O fim deve ser igual ou posterior ao início.", path: ["endDate"] }).refine((data) => (new Date(`${data.endDate}T00:00:00Z`).getTime() - new Date(`${data.startDate}T00:00:00Z`).getTime()) / 86_400_000 <= 366, { message: "O período deve ter no máximo 367 dias.", path: ["endDate"] });
+export const timeBankManualAdjustmentSchema = z.object({ employeeId: z.uuid(), date: z.string().date(), amountMinutes: z.coerce.number().int().min(-14400).max(14400).refine((value) => value !== 0, "O ajuste não pode ser zero."), reason: z.string().trim().min(5).max(500) });
+export const timeBankPolicySchema = z.object({ name: z.string().trim().min(3).max(100), effectiveFrom: z.string().date(), creditPercent: z.coerce.number().int().min(0).max(300), debitPercent: z.coerce.number().int().min(0).max(300) });

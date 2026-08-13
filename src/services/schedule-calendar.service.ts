@@ -6,6 +6,7 @@ import { dayOffSwaps, daysOff, employees, leavePeriods, scheduleDays, scheduleEx
 import type { ScheduleExceptionInput } from "@/validations/schedule-exception";
 import { resolveScheduleDay, type CalendarSituation } from "./schedule-resolution";
 import { recordAudit } from "./audit.service";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 export type { CalendarSituation } from "./schedule-resolution";
 
@@ -50,6 +51,7 @@ export async function listScheduleCalendarFilters() {
 
 export async function saveScheduleException(input: ScheduleExceptionInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    await assertPeriodRangeMutable(tx, input.date);
     const [existing] = await tx.select().from(scheduleExceptions).where(and(eq(scheduleExceptions.employeeId, input.employeeId), eq(scheduleExceptions.date, input.date))).limit(1);
     const values = { employeeId: input.employeeId, date: input.date, type: input.type, startTime: input.type === "WORK" ? input.startTime : null, endTime: input.type === "WORK" ? input.endTime : null, breakStartTime: input.type === "WORK" ? input.breakStartTime : null, breakEndTime: input.type === "WORK" ? input.breakEndTime : null, toleranceMinutes: input.type === "WORK" ? input.toleranceMinutes : 0, reason: input.reason, createdBy: performedBy };
     const [saved] = existing

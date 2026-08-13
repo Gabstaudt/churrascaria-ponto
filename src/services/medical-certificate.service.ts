@@ -6,6 +6,7 @@ import { absenceJustifications, absences, employees, medicalCertificates, users 
 import type { MedicalCertificateUploadInput } from "@/validations/medical-certificate";
 import { recordAudit } from "./audit.service";
 import { createPrivateDownloadUrl, createPrivateUploadUrl, deletePrivateObject, inspectPrivateObject } from "./object-storage.service";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 function safeExtension(contentType: string) { return contentType === "application/pdf" ? "pdf" : contentType === "image/png" ? "png" : "jpg"; }
 function retentionDate(from: string) { const date = new Date(`${from}T00:00:00Z`); date.setUTCFullYear(date.getUTCFullYear() + 5); return date.toISOString().slice(0, 10); }
@@ -33,6 +34,7 @@ export async function confirmMedicalCertificate(input: MedicalCertificateUploadI
   }
   try {
     return await db.transaction(async (tx) => {
+      await assertPeriodRangeMutable(tx, input.startDate, input.endDate);
       const [employee] = await tx.select({ id: employees.id }).from(employees).where(eq(employees.id, input.employeeId)).limit(1);
       if (!employee) throw new Error("Funcionário não encontrado.");
       let linkedAbsenceId = input.absenceId;

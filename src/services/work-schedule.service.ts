@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { employees, scheduleDays, workSchedules } from "@/db/schema";
 import type { WorkScheduleCreateInput } from "@/validations/work-schedule";
 import { recordAudit } from "./audit.service";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 export class ScheduleOverlapError extends Error {
   constructor() { super("Já existe uma jornada vigente nesse período para o funcionário."); this.name = "ScheduleOverlapError"; }
@@ -12,6 +13,7 @@ export class ScheduleOverlapError extends Error {
 
 export async function createWorkSchedule(input: WorkScheduleCreateInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    await assertPeriodRangeMutable(tx, input.validFrom, input.validTo ?? "9999-12-31");
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.employeeId}))`);
     const [employee] = await tx.select({ id: employees.id }).from(employees).where(eq(employees.id, input.employeeId)).limit(1);
     if (!employee) return undefined;
@@ -36,6 +38,7 @@ export async function createWorkSchedule(input: WorkScheduleCreateInput, perform
 
 export async function updateWorkSchedule(id: string, input: WorkScheduleCreateInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    await assertPeriodRangeMutable(tx, input.validFrom, input.validTo ?? "9999-12-31");
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.employeeId}))`);
     const [current] = await tx.select().from(workSchedules).where(eq(workSchedules.id, id)).limit(1);
     if (!current) return undefined;

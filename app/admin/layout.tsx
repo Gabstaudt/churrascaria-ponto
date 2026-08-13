@@ -1,4 +1,4 @@
-import { Clock3, LogOut, ShieldCheck } from "lucide-react";
+import { Clock3, LogOut } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { logoutAction } from "@/actions/auth";
@@ -13,7 +13,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <aside className="sidebar">
         <Link className="sidebar-brand" href="/admin"><span className="brand-mark small" aria-hidden="true"><Clock3 size={21} /></span><span><strong>Churrascaria</strong><small>Gestão de ponto</small></span></Link>
         <AdminNav />
-        <Link className="audit-side-link" href="/admin/auditoria"><ShieldCheck size={18} /><span><strong>Auditoria</strong><small>Trilha administrativa</small></span></Link>
         <form action={logoutAction} className="logout-form"><button className="nav-link logout-button" type="submit"><LogOut size={19} /> Sair</button></form>
       </aside>
       <div className="admin-main"><header className="topbar"><div><p>Ambiente administrativo</p><strong>{session.user.name}</strong></div><span className="avatar" aria-label={`Usuário ${session.user.name}`}>{initials}</span></header>{children}</div>

@@ -1,8 +1,9 @@
-import { CalendarDays, Clock3, LayoutDashboard, LogOut, UsersRound } from "lucide-react";
+import { CalendarDays, Clock3, LogOut } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { logoutAction } from "@/actions/auth";
 import { requireAdmin } from "@/auth/session";
+import { AdminNav } from "@/components/layout/admin-nav";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await requireAdmin();
@@ -11,9 +12,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className="admin-shell">
       <aside className="sidebar">
         <Link className="sidebar-brand" href="/admin"><span className="brand-mark small" aria-hidden="true"><Clock3 size={21} /></span><span><strong>Churrascaria</strong><small>Gestão de ponto</small></span></Link>
-        <nav aria-label="Navegação administrativa">
-          <Link className="nav-link active" href="/admin"><LayoutDashboard size={19} /> Painel</Link>
-          <span className="nav-link disabled"><UsersRound size={19} /> Funcionários <small>Em breve</small></span>
+        <AdminNav />
+        <nav aria-label="Módulos futuros">
           <span className="nav-link disabled"><CalendarDays size={19} /> Jornadas <small>Em breve</small></span>
         </nav>
         <form action={logoutAction} className="logout-form"><button className="nav-link logout-button" type="submit"><LogOut size={19} /> Sair</button></form>

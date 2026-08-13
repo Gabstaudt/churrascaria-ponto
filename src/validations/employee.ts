@@ -61,3 +61,9 @@ export const employeeCreateSchema = z.object({
 });
 
 export type EmployeeCreateInput = z.infer<typeof employeeCreateSchema>;
+
+export const employeeListQuerySchema = z.object({
+  query: z.string().trim().max(100).catch(""),
+  status: z.enum(employeeStatusValues).optional().catch(undefined),
+  page: z.coerce.number().int().positive().catch(1),
+});

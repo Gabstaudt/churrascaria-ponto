@@ -18,6 +18,10 @@ export default defineConfig({
   dbCredentials: {
     url: databaseUrl,
   },
+  migrations: {
+    table: "__drizzle_migrations",
+    schema: "public",
+  },
   strict: true,
   verbose: true,
 });

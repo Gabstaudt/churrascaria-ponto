@@ -191,10 +191,9 @@ para recursos sofisticados antes de estabilizar essa fundação.
 
 ## Estado de execução
 
-As Sprints 1 e 2 foram implementadas. A fundação PostgreSQL/Drizzle, autenticação
-Better Auth, sessões, autorização administrativa e layout protegido estão
-registrados em `docs/sprints/SPRINT_01.md` e `docs/sprints/SPRINT_02.md`.
+As Sprints 1, 2 e 3 foram implementadas e validadas com PostgreSQL local. A
+fundação Drizzle, autenticação, autorização administrativa e cadastro/listagem de
+funcionários estão registrados nos relatórios em `docs/sprints/`.
 
-As migrations ainda precisam ser aplicadas a um PostgreSQL de desenvolvimento e
-o fluxo de login deve ser validado com persistência real. Depois dessa ativação,
-o próximo trabalho planejado é a Sprint 3: cadastro e listagem de funcionários.
+O próximo trabalho planejado é a Sprint 4: detalhe, edição, status, inativação e
+reativação de funcionários, concluindo o primeiro marco funcional.

@@ -1,6 +1,6 @@
 "use client";
 
-import { BriefcaseBusiness, LoaderCircle, Save, UserRound } from "lucide-react";
+import { BriefcaseBusiness, LoaderCircle, PhoneCall, Save, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
 
@@ -71,7 +71,21 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
             <input id="admissionDate" name="admissionDate" defaultValue={employee?.admissionDate} type="date" required />
             <FieldError errors={state.errors?.admissionDate} />
           </div>
+          <div className="field-group">
+            <label htmlFor="workCardNumber">Carteira de trabalho <em>Opcional</em></label>
+            <input id="workCardNumber" name="workCardNumber" defaultValue={employee?.workCardNumber ?? ""} placeholder="Número da CTPS" maxLength={50} />
+            <FieldError errors={state.errors?.workCardNumber} />
+          </div>
           {employee ? <div className="field-group"><label htmlFor="status">Status <span aria-hidden="true">*</span></label><select id="status" name="status" defaultValue={employee.status}>{statusOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select><FieldError errors={state.errors?.status} /></div> : null}
+        </div>
+      </section>
+
+      <section className="form-section" aria-labelledby="emergency-title">
+        <div className="form-section-heading"><span><PhoneCall size={20} /></span><div><h2 id="emergency-title">Contato de emergência</h2><p>Pessoa a ser contatada em caso de necessidade.</p></div></div>
+        <div className="form-grid form-grid-3">
+          <div className="field-group"><label htmlFor="emergencyContactName">Nome <em>Opcional</em></label><input id="emergencyContactName" name="emergencyContactName" defaultValue={employee?.emergencyContactName ?? ""} maxLength={150} /><FieldError errors={state.errors?.emergencyContactName} /></div>
+          <div className="field-group"><label htmlFor="emergencyContactRelationship">Parentesco/relação <em>Opcional</em></label><input id="emergencyContactRelationship" name="emergencyContactRelationship" defaultValue={employee?.emergencyContactRelationship ?? ""} placeholder="Ex.: Cônjuge" maxLength={80} /><FieldError errors={state.errors?.emergencyContactRelationship} /></div>
+          <div className="field-group"><label htmlFor="emergencyContactPhone">Telefone <em>Opcional</em></label><input id="emergencyContactPhone" name="emergencyContactPhone" defaultValue={employee?.emergencyContactPhone ?? ""} type="tel" inputMode="tel" placeholder="(91) 99999-9999" maxLength={16} /><FieldError errors={state.errors?.emergencyContactPhone} /></div>
         </div>
       </section>
 

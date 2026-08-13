@@ -85,6 +85,10 @@ function auditSnapshot(employee: typeof employees.$inferSelect) {
     admissionDate: employee.admissionDate,
     status: employee.status,
     isActive: employee.isActive,
+    workCardNumber: employee.workCardNumber,
+    emergencyContactName: employee.emergencyContactName,
+    emergencyContactRelationship: employee.emergencyContactRelationship,
+    emergencyContactPhone: employee.emergencyContactPhone,
   };
 }
 

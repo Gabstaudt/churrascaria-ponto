@@ -7,7 +7,7 @@ import { EmployeeConflictError } from "@/services/employee-errors";
 import { createEmployee, setEmployeeActive, updateEmployee } from "@/services/employee.service";
 import { employeeCreateSchema, employeeIdSchema, employeeUpdateSchema } from "@/validations/employee";
 
-export type EmployeeField = "fullName" | "cpf" | "phone" | "position" | "registrationNumber" | "admissionDate" | "status";
+export type EmployeeField = "fullName" | "cpf" | "phone" | "position" | "registrationNumber" | "admissionDate" | "status" | "workCardNumber" | "emergencyContactName" | "emergencyContactRelationship" | "emergencyContactPhone";
 
 export type EmployeeFormState = {
   message?: string;
@@ -26,6 +26,10 @@ export async function createEmployeeAction(
     position: formData.get("position"),
     registrationNumber: formData.get("registrationNumber"),
     admissionDate: formData.get("admissionDate"),
+    workCardNumber: formData.get("workCardNumber"),
+    emergencyContactName: formData.get("emergencyContactName"),
+    emergencyContactRelationship: formData.get("emergencyContactRelationship"),
+    emergencyContactPhone: formData.get("emergencyContactPhone"),
   });
 
   if (!parsed.success) {
@@ -64,6 +68,10 @@ function employeeInput(formData: FormData) {
     registrationNumber: formData.get("registrationNumber"),
     admissionDate: formData.get("admissionDate"),
     status: formData.get("status"),
+    workCardNumber: formData.get("workCardNumber"),
+    emergencyContactName: formData.get("emergencyContactName"),
+    emergencyContactRelationship: formData.get("emergencyContactRelationship"),
+    emergencyContactPhone: formData.get("emergencyContactPhone"),
   };
 }
 

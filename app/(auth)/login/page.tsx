@@ -2,10 +2,11 @@ import { Clock3, ShieldCheck } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/auth/session";
 import { LoginForm } from "@/components/auth/login-form";
+import { portalHome } from "@/services/portal-access";
 
 export default async function LoginPage() {
   const session = await getSession();
-  if (session?.user.isActive) redirect("/admin");
+  if (session?.user.isActive) redirect(portalHome(session.user.role));
 
   return (
     <main className="auth-page">

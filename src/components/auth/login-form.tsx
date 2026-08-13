@@ -27,7 +27,7 @@ export function LoginForm() {
       setPending(false);
       return;
     }
-    router.replace("/admin");
+    router.replace("/");
     router.refresh();
   }
 

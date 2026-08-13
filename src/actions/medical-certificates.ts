@@ -1,7 +1,9 @@
 "use server";
 
 import { requireAdmin } from "@/auth/session";
-import { confirmMedicalCertificate, prepareMedicalCertificateUpload } from "@/services/medical-certificate.service";
+import { redirect } from "next/navigation";
+import { confirmMedicalCertificate, prepareMedicalCertificateUpload, reviewMedicalCertificate } from "@/services/medical-certificate.service";
+import { portalReviewSchema } from "@/validations/portal";
 import { medicalCertificateUploadSchema } from "@/validations/medical-certificate";
 
 export type CertificateActionResult = { ok: true; key?: string; uploadUrl?: string; id?: string } | { ok: false; message: string };
@@ -15,6 +17,8 @@ export async function prepareMedicalCertificateUploadAction(input: unknown): Pro
     return { ok: true, key: prepared.key, uploadUrl: prepared.uploadUrl };
   } catch (error) { return { ok: false, message: error instanceof Error ? error.message : "Não foi possível preparar o envio." }; }
 }
+
+export async function reviewMedicalCertificateAction(id: string, formData: FormData) { const session = await requireAdmin(); const parsed = portalReviewSchema.safeParse({ decision: formData.get("decision"), reason: formData.get("reason") }); if (!parsed.success) redirect("/admin/atestados?error=review"); const saved = await reviewMedicalCertificate(id, parsed.data.decision, parsed.data.reason, session.user.id); if (!saved) redirect("/admin/atestados?error=not-found"); redirect("/admin/atestados?saved=review"); }
 
 export async function confirmMedicalCertificateAction(input: unknown): Promise<CertificateActionResult> {
   const session = await requireAdmin();

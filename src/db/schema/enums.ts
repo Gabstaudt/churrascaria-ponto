@@ -20,6 +20,9 @@ export const absenceDecisionValues = ["UNJUSTIFIED", "JUSTIFIED", "MEDICAL_CERTI
 export const timeBankEntryTypeValues = ["DAILY_CALCULATION", "RECALCULATION", "MANUAL_ADJUSTMENT"] as const;
 export const closingPeriodStatusValues = ["OPEN", "IN_REVIEW", "CLOSED"] as const;
 export const closingPeriodEventValues = ["CREATED", "SENT_TO_REVIEW", "CLOSED", "REOPENED"] as const;
+export const requestStatusValues = ["PENDING", "APPROVED", "REJECTED"] as const;
+export const correctionRequestTypeValues = ["ADD_ENTRY", "IGNORE_ENTRY", "FORGOTTEN_EXIT", "OTHER"] as const;
+export const medicalCertificateStatusValues = ["PENDING", "APPROVED", "REJECTED"] as const;
 
 export type EmployeeStatus = (typeof employeeStatusValues)[number];
 
@@ -37,3 +40,6 @@ export const absenceDecisionEnum = pgEnum("absence_decision", absenceDecisionVal
 export const timeBankEntryTypeEnum = pgEnum("time_bank_entry_type", timeBankEntryTypeValues);
 export const closingPeriodStatusEnum = pgEnum("closing_period_status", closingPeriodStatusValues);
 export const closingPeriodEventEnum = pgEnum("closing_period_event", closingPeriodEventValues);
+export const requestStatusEnum = pgEnum("request_status", requestStatusValues);
+export const correctionRequestTypeEnum = pgEnum("correction_request_type", correctionRequestTypeValues);
+export const medicalCertificateStatusEnum = pgEnum("medical_certificate_status", medicalCertificateStatusValues);

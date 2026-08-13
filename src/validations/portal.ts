@@ -1,0 +1,4 @@
+import { z } from "zod";
+export const correctionRequestSchema = z.object({ date: z.string().date(), type: z.enum(["ADD_ENTRY", "IGNORE_ENTRY", "FORGOTTEN_EXIT", "OTHER"]), requestedTime: z.union([z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/), z.literal("")]).optional().transform((value) => value || undefined), reason: z.string().trim().min(5).max(500) }).refine((data) => !["ADD_ENTRY", "FORGOTTEN_EXIT"].includes(data.type) || Boolean(data.requestedTime), { message: "Informe o horário solicitado.", path: ["requestedTime"] });
+export const portalReviewSchema = z.object({ decision: z.enum(["APPROVED", "REJECTED"]), reason: z.string().trim().min(5).max(500) });
+export const portalSwapSchema = z.object({ dayOffDate: z.string().date(), workDate: z.string().date(), reason: z.string().trim().min(5).max(500) }).refine((data) => data.dayOffDate !== data.workDate, { message: "As datas devem ser diferentes." });

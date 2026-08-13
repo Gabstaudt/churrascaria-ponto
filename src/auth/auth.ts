@@ -35,6 +35,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: { type: ["ADMIN", "MANAGER", "EMPLOYEE"], required: true, defaultValue: "EMPLOYEE", input: false },
       isActive: { type: "boolean", required: true, defaultValue: true, input: false },
+      employeeId: { type: "string", required: false, input: false },
     },
   },
   session: { expiresIn: 60 * 60 * 8, updateAge: 60 * 30 },

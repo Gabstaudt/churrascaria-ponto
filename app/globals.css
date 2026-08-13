@@ -512,6 +512,7 @@ a { color: inherit; text-decoration: none; }
 .operational-actual em { color: #9f312a; font-size: .67rem; font-style: normal; font-weight: 800; }
 .daily-status { justify-self: start; padding: .32rem .55rem; border-radius: 999px; font-size: .67rem; font-weight: 850; white-space: nowrap; }
 .daily-present { background: #e5f2e9; color: #286443; }
+.daily-late_justified { background: #e8f1fb; color: #285c8e; }
 .daily-late, .daily-expected { background: #fff2d9; color: #805911; }
 .daily-incomplete, .daily-possible_absence { background: #fff0ef; color: #9f312a; }
 .daily-off, .daily-vacation, .daily-leave { background: #e8f1fb; color: #285c8e; }
@@ -539,6 +540,46 @@ a { color: inherit; text-decoration: none; }
   .operational-date { display: grid; grid-template-columns: 1fr; }
   .operational-summary { grid-template-columns: 1fr; }
   .operational-summary article { min-height: 4rem; }
+}
+
+/* Sprint 10: append-only time treatments. */
+.treatment-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.treatment-page .status-pill { display: inline-flex; align-items: center; gap: .35rem; }
+.treatment-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(19rem, .75fr); align-items: start; gap: 1rem; margin-top: 2rem; }
+.treatment-column { display: grid; min-width: 0; gap: 1rem; }
+.treatment-panel { margin-top: 0; border-radius: .9rem; }
+.treatment-panel > header { display: grid; grid-template-columns: 2.3rem minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .9rem 1rem; border-bottom: 1px solid var(--line); background: #f8faf8; color: var(--brand); }
+.treatment-panel > header h2, .treatment-create > header h2 { margin: 0 0 .15rem; color: var(--ink); font-size: 1rem; }
+.treatment-panel > header p, .treatment-create > header p { margin: 0; color: var(--muted); font-size: .74rem; }
+.treatment-panel > header > span { color: var(--muted); font-size: .72rem; }
+.treatment-entries { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; padding: 1rem; }
+.treatment-entries > div { display: grid; gap: .2rem; padding: .8rem; border: 1px solid var(--line); border-radius: .65rem; background: #fafbfa; }
+.treatment-entries strong { color: var(--brand); font-size: 1.1rem; }
+.treatment-entries small, .treatment-entries em { overflow: hidden; color: var(--muted); font-size: .67rem; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+.treatment-history { display: grid; }
+.treatment-history article { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .35rem .8rem; padding: .85rem 1rem; border-bottom: 1px solid #edf0ed; }
+.treatment-history article:last-child { border-bottom: 0; }
+.treatment-history article > div { display: grid; gap: .2rem; }
+.treatment-history small { color: var(--muted); font-size: .68rem; }
+.treatment-history article > span { color: var(--brand); font-weight: 850; }
+.treatment-history p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .74rem; line-height: 1.4; }
+.treatment-create { margin-top: 0; overflow: hidden; border-radius: .9rem; }
+.treatment-create > header { padding: .9rem 1rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.treatment-form { gap: .9rem; padding: 1rem; }
+.treatment-form textarea { width: 100%; resize: vertical; padding: .7rem; border: 1px solid var(--line); border-radius: .6rem; font: inherit; }
+.treatment-submit { width: 100%; }
+
+@media (max-width: 900px) {
+  .treatment-layout { grid-template-columns: 1fr; }
+  .treatment-create { grid-row: 1; }
+}
+
+@media (max-width: 600px) {
+  .treatment-entries { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 400px) {
+  .treatment-entries { grid-template-columns: 1fr; }
 }
 
 /* Sprint 6: operational calendar and date exceptions */

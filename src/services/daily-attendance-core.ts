@@ -1,6 +1,6 @@
 import type { CalendarSituation } from "./schedule-resolution";
 
-export type DailyStatus = "EXPECTED" | "PRESENT" | "LATE" | "INCOMPLETE" | "POSSIBLE_ABSENCE" | "OFF" | "VACATION" | "LEAVE" | "NO_SCHEDULE";
+export type DailyStatus = "EXPECTED" | "PRESENT" | "LATE" | "LATE_JUSTIFIED" | "INCOMPLETE" | "POSSIBLE_ABSENCE" | "OFF" | "VACATION" | "LEAVE" | "NO_SCHEDULE";
 export type EntryLike = { id: string; occurredAt: Date };
 
 export function belemDate(value: Date) {

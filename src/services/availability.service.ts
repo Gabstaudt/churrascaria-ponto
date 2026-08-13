@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { dayOffSwaps, daysOff, employees, leavePeriods, vacations } from "@/db/schema";
 import type { AvailabilityCreateInput } from "@/validations/availability";
 import { recordAudit } from "./audit.service";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 export class AvailabilityConflictError extends Error {
   constructor(message = "Já existe férias ou afastamento nesse período para o funcionário.") { super(message); this.name = "AvailabilityConflictError"; }
@@ -20,6 +21,8 @@ async function hasPeriodConflict(tx: Parameters<Parameters<typeof db.transaction
 
 export async function createAvailability(input: AvailabilityCreateInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    const dates = input.kind === "DAY_OFF" ? [input.date!, input.date!] : input.kind === "SWAP" ? [input.date! < input.workDate! ? input.date! : input.workDate!, input.date! > input.workDate! ? input.date! : input.workDate!] : [input.startDate!, input.endDate!];
+    await assertPeriodRangeMutable(tx, dates[0], dates[1]);
     if (input.kind === "DAY_OFF") {
       const [existing] = await tx.select().from(daysOff).where(and(eq(daysOff.employeeId, input.employeeId), eq(daysOff.date, input.date!))).limit(1);
       if (!existing && await hasPeriodConflict(tx, input.employeeId, input.date!, input.date!)) throw new AvailabilityConflictError("A folga conflita com outro período ou troca aprovada.");
@@ -48,6 +51,7 @@ export async function reviewDayOffSwap(id: string, decision: "APPROVED" | "REJEC
   return db.transaction(async (tx) => {
     const [current] = await tx.select().from(dayOffSwaps).where(eq(dayOffSwaps.id, id)).limit(1);
     if (!current || current.status !== "PENDING") return undefined;
+    await assertPeriodRangeMutable(tx, current.dayOffDate < current.workDate ? current.dayOffDate : current.workDate, current.dayOffDate > current.workDate ? current.dayOffDate : current.workDate);
     if (decision === "APPROVED" && (await hasPeriodConflict(tx, current.employeeId, current.dayOffDate, current.workDate))) throw new AvailabilityConflictError("A troca conflita com férias ou afastamento do funcionário.");
     const [saved] = await tx.update(dayOffSwaps).set({ status: decision, reviewedBy: performedBy, reviewedAt: new Date(), reviewReason: reason }).where(eq(dayOffSwaps.id, id)).returning();
     await recordAudit(tx, { action: decision === "APPROVED" ? "APPROVE_DAY_OFF_SWAP" : "REJECT_DAY_OFF_SWAP", entity: "DayOffSwap", entityId: id, performedBy, before: current, after: saved!, reason });

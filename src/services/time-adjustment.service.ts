@@ -6,11 +6,13 @@ import { timeAdjustments, timeEntries, users } from "@/db/schema";
 import type { TimeAdjustmentInput } from "@/validations/time-adjustment";
 import { officialDateTime } from "./daily-attendance-core";
 import { recordAudit } from "./audit.service";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 export class InvalidOriginalEntryError extends Error { constructor() { super("A marcação original não pertence ao funcionário e à data informados."); this.name = "InvalidOriginalEntryError"; } }
 
 export async function createTimeAdjustment(input: TimeAdjustmentInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    await assertPeriodRangeMutable(tx, input.date);
     if (input.originalTimeEntryId) {
       const start = new Date(`${input.date}T00:00:00-03:00`); const end = new Date(`${input.date}T23:59:59.999-03:00`);
       const [entry] = await tx.select({ id: timeEntries.id }).from(timeEntries).where(and(eq(timeEntries.id, input.originalTimeEntryId), eq(timeEntries.employeeId, input.employeeId), gte(timeEntries.occurredAt, start), lte(timeEntries.occurredAt, end))).limit(1);

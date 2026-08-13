@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, CalendarRange, LayoutDashboard, Scale, ShieldCheck, UsersRound } from "lucide-react";
+import { CalendarCheck2, CalendarDays, CalendarRange, LayoutDashboard, Scale, ShieldCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/escalas", label: "Escalas", icon: CalendarRange, exact: false, desktopOnly: false },
   { href: "/admin/auditoria", label: "Auditoria", icon: ShieldCheck, exact: false, desktopOnly: true },
   { href: "/admin/banco-horas", label: "Banco de horas", icon: Scale, exact: false, desktopOnly: true },
+  { href: "/admin/fechamentos", label: "Fechamentos", icon: CalendarCheck2, exact: false, desktopOnly: true },
 ];
 
 export function AdminNav() {

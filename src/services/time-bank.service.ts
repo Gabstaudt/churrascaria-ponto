@@ -8,6 +8,7 @@ import { ATTENDANCE_CALCULATION_VERSION } from "./attendance-calculation";
 import { getDailyAttendanceCalculation } from "./attendance.service";
 import { recordAudit } from "./audit.service";
 import { applyTimeBankPolicy, reconcileDailyBalance, timeBankConcurrencyKey } from "./time-bank-core";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 type PeriodInput = { employeeId: string; startDate: string; endDate: string };
 type ManualInput = { employeeId: string; date: string; amountMinutes: number; reason: string };
@@ -31,6 +32,7 @@ export async function processTimeBankPeriod(input: PeriodInput, performedBy: str
     const calculated = applyTimeBankPolicy(attendance.calculation.balanceMinutes, policy.creditBasisPoints, policy.debitBasisPoints);
     const sourceFingerprint = fingerprint(attendance, policy);
     const changed = await db.transaction(async (tx) => {
+      await assertPeriodRangeMutable(tx, date);
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${timeBankConcurrencyKey(input.employeeId, date)}))`);
       const [sameSource] = await tx.select({ id: timeBankEntries.id }).from(timeBankEntries).where(and(eq(timeBankEntries.employeeId, input.employeeId), eq(timeBankEntries.referenceDate, date), eq(timeBankEntries.sourceFingerprint, sourceFingerprint))).limit(1);
       if (sameSource) return false;
@@ -48,6 +50,7 @@ export async function processTimeBankPeriod(input: PeriodInput, performedBy: str
 
 export async function createManualTimeBankAdjustment(input: ManualInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    await assertPeriodRangeMutable(tx, input.date);
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${timeBankConcurrencyKey(input.employeeId, input.date)}))`);
     const [employee] = await tx.select({ id: employees.id }).from(employees).where(eq(employees.id, input.employeeId)).limit(1);
     if (!employee) return undefined;

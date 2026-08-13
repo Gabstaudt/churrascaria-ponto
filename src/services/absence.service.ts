@@ -5,9 +5,11 @@ import { db } from "@/db";
 import { absenceJustifications, absences, employees, users } from "@/db/schema";
 import type { AbsenceDecisionInput } from "@/validations/absence";
 import { recordAudit } from "./audit.service";
+import { assertPeriodRangeMutable } from "./period-lock.service";
 
 export async function decideAbsence(input: AbsenceDecisionInput, performedBy: string) {
   return db.transaction(async (tx) => {
+    await assertPeriodRangeMutable(tx, input.date);
     const [current] = await tx.select().from(absences).where(and(eq(absences.employeeId, input.employeeId), eq(absences.date, input.date))).limit(1);
     const [absence] = current
       ? await tx.update(absences).set({ decision: input.decision, decidedBy: performedBy, decidedAt: new Date() }).where(eq(absences.id, current.id)).returning()

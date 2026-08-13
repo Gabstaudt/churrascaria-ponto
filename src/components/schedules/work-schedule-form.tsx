@@ -1,0 +1,23 @@
+"use client";
+
+import { LoaderCircle, Save } from "lucide-react";
+import Link from "next/link";
+import { useActionState, useMemo, useState } from "react";
+import { createWorkScheduleAction, type ScheduleFormState } from "@/actions/work-schedules";
+
+const weekDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+type Day = { dayOfWeek: number; isWorkDay: boolean; startTime?: string; endTime?: string; breakStartTime?: string; breakEndTime?: string; toleranceMinutes: number };
+
+export function WorkScheduleForm({ employees, selectedEmployeeId }: { employees: Array<{ id: string; fullName: string; registrationNumber: string }>; selectedEmployeeId?: string }) {
+  const [state, action, pending] = useActionState(createWorkScheduleAction, {} as ScheduleFormState);
+  const [days, setDays] = useState<Day[]>(() => weekDays.map((_, dayOfWeek) => ({ dayOfWeek, isWorkDay: dayOfWeek > 0 && dayOfWeek < 6, startTime: "11:00", endTime: "16:00", breakStartTime: "", breakEndTime: "", toleranceMinutes: 10 })));
+  const serialized = useMemo(() => JSON.stringify(days.map((day) => ({ ...day, startTime: day.startTime || undefined, endTime: day.endTime || undefined, breakStartTime: day.breakStartTime || undefined, breakEndTime: day.breakEndTime || undefined }))), [days]);
+  function update(index: number, patch: Partial<Day>) { setDays((current) => current.map((day, position) => position === index ? { ...day, ...patch } : day)); }
+
+  return <form className="employee-form" action={action}>
+    <section className="form-section"><div className="form-section-heading"><div><h2>Identificação e vigência</h2><p>A jornada passa a valer na data inicial e preserva jornadas anteriores.</p></div></div><div className="form-grid form-grid-3"><div className="field-group"><label htmlFor="employeeId">Funcionário *</label><select id="employeeId" name="employeeId" defaultValue={selectedEmployeeId ?? ""} required><option value="" disabled>Selecione</option>{employees.map((employee) => <option key={employee.id} value={employee.id}>{employee.fullName} · {employee.registrationNumber}</option>)}</select></div><div className="field-group"><label htmlFor="name">Nome da jornada *</label><input id="name" name="name" placeholder="Ex.: Jornada padrão" required /></div><div className="field-group"><label htmlFor="validFrom">Início da vigência *</label><input id="validFrom" name="validFrom" type="date" required /></div><div className="field-group"><label htmlFor="validTo">Fim da vigência <em>Opcional</em></label><input id="validTo" name="validTo" type="date" /></div></div></section>
+    <section className="form-section"><div className="form-section-heading"><div><h2>Semana de trabalho</h2><p>Configure cada dia individualmente. Desmarque os dias de folga.</p></div></div><input type="hidden" name="days" value={serialized} /><div className="schedule-days">{days.map((day, index) => <article className={`schedule-day${day.isWorkDay ? "" : " off"}`} key={day.dayOfWeek}><header><label><input type="checkbox" checked={day.isWorkDay} onChange={(event) => update(index, { isWorkDay: event.target.checked })} /><span>{weekDays[index]}</span></label><small>{day.isWorkDay ? "Trabalho" : "Folga"}</small></header>{day.isWorkDay ? <div className="schedule-time-grid"><label>Entrada<input type="time" value={day.startTime} onChange={(event) => update(index, { startTime: event.target.value })} /></label><label>Saída<input type="time" value={day.endTime} onChange={(event) => update(index, { endTime: event.target.value })} /></label><label>Início intervalo<input type="time" value={day.breakStartTime} onChange={(event) => update(index, { breakStartTime: event.target.value })} /></label><label>Fim intervalo<input type="time" value={day.breakEndTime} onChange={(event) => update(index, { breakEndTime: event.target.value })} /></label><label>Tolerância (min)<input type="number" min="0" max="120" value={day.toleranceMinutes} onChange={(event) => update(index, { toleranceMinutes: Number(event.target.value) })} /></label></div> : <p className="day-off-label">Nenhum horário previsto.</p>}</article>)}</div></section>
+    {state.message ? <div className="form-error" role="alert"><strong>{state.message}</strong>{state.errors?.length ? <ul>{state.errors.map((error) => <li key={error}>{error}</li>)}</ul> : null}</div> : null}
+    <div className="form-actions"><Link className="cancel-button" href="/admin/jornadas">Cancelar</Link><button className="primary-button action-button" disabled={pending} type="submit">{pending ? <LoaderCircle className="spin" size={18} /> : <Save size={18} />}{pending ? "Salvando..." : "Criar jornada"}</button></div>
+  </form>;
+}

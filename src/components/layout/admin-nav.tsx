@@ -1,12 +1,13 @@
 "use client";
 
-import { LayoutDashboard, UsersRound } from "lucide-react";
+import { CalendarDays, LayoutDashboard, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/admin", label: "Painel", icon: LayoutDashboard, exact: true },
   { href: "/admin/funcionarios", label: "Funcionários", icon: UsersRound, exact: false },
+  { href: "/admin/jornadas", label: "Jornadas", icon: CalendarDays, exact: false },
 ];
 
 export function AdminNav() {

@@ -36,6 +36,13 @@
       "when": 1786633730159,
       "tag": "0004_aspiring_the_liberteens",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786635005463,
+      "tag": "0005_fancy_ogun",
+      "breakpoints": true
     }
   ]
 }

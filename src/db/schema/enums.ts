@@ -10,6 +10,9 @@ export const employeeStatusValues = [
   "INACTIVE",
 ] as const;
 
+export const scheduleExceptionTypeValues = ["WORK", "OFF"] as const;
+export type ScheduleExceptionType = (typeof scheduleExceptionTypeValues)[number];
+
 export type EmployeeStatus = (typeof employeeStatusValues)[number];
 
 export const userRoleEnum = pgEnum("user_role", userRoleValues);
@@ -17,3 +20,4 @@ export const employeeStatusEnum = pgEnum(
   "employee_status",
   employeeStatusValues,
 );
+export const scheduleExceptionTypeEnum = pgEnum("schedule_exception_type", scheduleExceptionTypeValues);

@@ -6,3 +6,4 @@ export * from "./employee-documents";
 export * from "./enums";
 export * from "./users";
 export * from "./work-schedules";
+export * from "./schedule-exceptions";

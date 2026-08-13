@@ -398,6 +398,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Sprint 6: operational calendar and date exceptions */
 .calendar-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.calendar-page .page-heading-actions { display: flex; align-items: center; gap: .6rem; }
 .calendar-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
 .calendar-heading h1 { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -.045em; }
 .calendar-heading > div > p:last-child { max-width: 42rem; margin: .65rem 0 0; color: var(--muted); line-height: 1.55; }
@@ -430,6 +431,8 @@ a { color: inherit; text-decoration: none; }
 .calendar-situation { justify-self: start; padding: .32rem .55rem; border-radius: 999px; font-size: .69rem; font-weight: 850; }
 .situation-work { background: #e5f2e9; color: #286443; }
 .situation-off { background: #e8eef8; color: #395f8d; }
+.situation-vacation { background: #fff2d9; color: #805911; }
+.situation-leave { background: #f1e9f8; color: #684783; }
 .situation-no_schedule { background: #eef0ee; color: #5d6660; }
 .calendar-adjust { display: inline-flex; align-items: center; gap: .35rem; color: var(--brand); font-size: .75rem; font-weight: 800; }
 .exception-body { display: grid; gap: 1.2rem; padding: 1.25rem; }
@@ -456,6 +459,8 @@ a { color: inherit; text-decoration: none; }
   .sidebar .admin-navigation { grid-template-columns: repeat(4, 1fr); }
   .calendar-heading { align-items: stretch; flex-direction: column; gap: 1.2rem; }
   .calendar-heading .action-button { width: 100%; }
+  .calendar-page .page-heading-actions { display: grid; grid-template-columns: 1fr; }
+  .calendar-page .page-heading-actions > a { width: 100%; justify-content: center; }
   .calendar-controls { align-items: stretch; flex-direction: column; }
   .calendar-view-tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
   .calendar-view-tabs a { min-width: 0; }
@@ -472,4 +477,51 @@ a { color: inherit; text-decoration: none; }
   .calendar-filters > span { grid-column: auto; }
   .calendar-date > header { align-items: flex-start; }
   .calendar-date > header div { display: grid; gap: .15rem; }
+}
+
+/* Sprint 7: scoped availability screens, reusing the administrative layout. */
+.availability-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.availability-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; margin-top: 2rem; }
+.availability-section { margin-top: 0; border-radius: 1rem; }
+.availability-section > header { display: grid; grid-template-columns: 2.35rem minmax(0, 1fr) auto; align-items: center; gap: .75rem; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.availability-section > header > span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border-radius: .65rem; background: #e6efe8; color: var(--brand); }
+.availability-section h2 { margin: 0 0 .15rem; font-size: 1rem; }
+.availability-section header p { margin: 0; color: var(--muted); font-size: .75rem; }
+.availability-section header em { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 999px; background: #e7f0e9; color: var(--brand); font-size: .75rem; font-style: normal; font-weight: 850; }
+.availability-records { display: grid; }
+.availability-record { display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(12rem, 1.2fr) auto; align-items: center; gap: .8rem; padding: 1rem 1.15rem; border-bottom: 1px solid #edf0ed; }
+.availability-record:last-child { border-bottom: 0; }
+.availability-record.simple { grid-template-columns: minmax(9rem, 1fr) minmax(12rem, 1.2fr); }
+.availability-record > div { display: grid; min-width: 0; gap: .2rem; }
+.availability-record small { color: var(--muted); font-size: .72rem; }
+.availability-record p { margin: .1rem 0 0; overflow-wrap: anywhere; color: var(--muted); font-size: .75rem; line-height: 1.4; }
+.availability-empty { padding: 2rem 1rem; color: var(--muted); font-size: .82rem; text-align: center; }
+.availability-alert { margin-top: 1rem; }
+.swap-status { padding: .3rem .55rem; border-radius: 999px; font-size: .68rem; font-weight: 850; }
+.swap-status.status-pending { background: #fff2d9; color: #805911; }
+.swap-status.status-approved { background: #e5f2e9; color: #286443; }
+.swap-status.status-rejected { background: #fff0ef; color: #9f312a; }
+.swap-review { display: grid; grid-column: 1 / -1; grid-template-columns: minmax(10rem, 1fr) auto auto; gap: .5rem; padding-top: .75rem; border-top: 1px solid #edf0ed; }
+.swap-review input { min-width: 0; min-height: 2.5rem; padding: 0 .7rem; border: 1px solid var(--line); border-radius: .55rem; }
+.swap-review button { padding: 0 .8rem; border: 0; border-radius: .55rem; background: var(--brand); color: white; font-weight: 800; cursor: pointer; }
+.swap-review button.reject { border: 1px solid #e2b7b3; background: #fff7f6; color: #9f312a; }
+.availability-kind { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; padding: 1rem; }
+.availability-kind label { display: flex; min-height: 3.5rem; align-items: center; gap: .55rem; padding: .8rem; border: 1px solid var(--line); border-radius: .7rem; background: #fafbfa; cursor: pointer; }
+.availability-kind label.selected { border-color: var(--brand); background: #edf4ef; color: var(--brand); }
+.availability-kind input { width: auto; min-height: auto; }
+.availability-fields { padding: 1.25rem; }
+.availability-form textarea { width: 100%; resize: vertical; padding: .8rem; border: 1px solid var(--line); border-radius: .65rem; background: #fcfdfc; color: var(--ink); font: inherit; }
+.availability-form textarea:focus { border-color: var(--brand); outline: 0; box-shadow: 0 0 0 3px rgb(49 95 72 / 10%); }
+
+@media (max-width: 900px) {
+  .availability-grid { grid-template-columns: 1fr; }
+  .availability-kind { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .availability-record, .availability-record.simple { grid-template-columns: 1fr; }
+  .swap-status { justify-self: start; }
+  .swap-review { grid-template-columns: 1fr; }
+  .swap-review button { min-height: 2.5rem; }
+  .availability-kind { grid-template-columns: 1fr; }
 }

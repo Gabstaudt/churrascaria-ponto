@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { employeeCreateSchema } from "./employee";
+import { employeeCreateSchema, employeeListQuerySchema } from "./employee";
 
 const validEmployee = {
   fullName: "Maria da Silva",
@@ -49,5 +49,15 @@ describe("employeeCreateSchema", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("employeeListQuerySchema", () => {
+  it("normaliza filtros e paginação", () => {
+    expect(employeeListQuerySchema.parse({ query: "  Maria  ", status: "ACTIVE", page: "2" })).toEqual({ query: "Maria", status: "ACTIVE", page: 2 });
+  });
+
+  it("usa padrões seguros para parâmetros inválidos", () => {
+    expect(employeeListQuerySchema.parse({ query: "", status: "INVALID", page: "-1" })).toEqual({ query: "", status: undefined, page: 1 });
   });
 });

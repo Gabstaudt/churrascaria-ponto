@@ -10,6 +10,8 @@ export const employeeStatusValues = [
   "INACTIVE",
 ] as const;
 
+export type EmployeeStatus = (typeof employeeStatusValues)[number];
+
 export const userRoleEnum = pgEnum("user_role", userRoleValues);
 export const employeeStatusEnum = pgEnum(
   "employee_status",

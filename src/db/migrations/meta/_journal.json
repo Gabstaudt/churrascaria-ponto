@@ -15,6 +15,20 @@
       "when": 1786626525555,
       "tag": "0001_flawless_thanos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786629027443,
+      "tag": "0002_small_strong_guy",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786632938123,
+      "tag": "0003_brave_hex",
+      "breakpoints": true
     }
   ]
 }

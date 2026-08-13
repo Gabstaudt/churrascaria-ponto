@@ -22,6 +22,10 @@ export const employees = pgTable(
       .notNull()
       .unique(),
     admissionDate: date("admission_date", { mode: "string" }).notNull(),
+    workCardNumber: varchar("work_card_number", { length: 50 }),
+    emergencyContactName: varchar("emergency_contact_name", { length: 150 }),
+    emergencyContactRelationship: varchar("emergency_contact_relationship", { length: 80 }),
+    emergencyContactPhone: varchar("emergency_contact_phone", { length: 15 }),
     status: employeeStatusEnum("status").notNull().default("ACTIVE"),
     photoUrl: varchar("photo_url", { length: 2048 }),
     isActive: boolean("is_active").notNull().default(true),

@@ -31,6 +31,9 @@ const optionalPhoneSchema = z
   .transform((value) => value || undefined)
   .optional();
 
+const optionalText = (maximum: number) =>
+  z.string().trim().max(maximum).transform((value) => value || undefined).optional();
+
 export const employeeCreateSchema = z.object({
   fullName: z
     .string()
@@ -55,9 +58,37 @@ export const employeeCreateSchema = z.object({
   admissionDate: z
     .string()
     .refine(isValidIsoDate, "Informe uma data de admissão válida."),
+  workCardNumber: optionalText(50),
+  emergencyContactName: optionalText(150),
+  emergencyContactRelationship: optionalText(80),
+  emergencyContactPhone: optionalPhoneSchema,
   status: z.enum(employeeStatusValues).default("ACTIVE"),
   photoUrl: z.url("Informe uma URL de foto válida.").max(2048).optional(),
   isActive: z.boolean().default(true),
 });
 
 export type EmployeeCreateInput = z.infer<typeof employeeCreateSchema>;
+
+export const employeeUpdateSchema = employeeCreateSchema.pick({
+  fullName: true,
+  cpf: true,
+  phone: true,
+  position: true,
+  registrationNumber: true,
+  admissionDate: true,
+  status: true,
+  workCardNumber: true,
+  emergencyContactName: true,
+  emergencyContactRelationship: true,
+  emergencyContactPhone: true,
+});
+
+export type EmployeeUpdateInput = z.infer<typeof employeeUpdateSchema>;
+
+export const employeeIdSchema = z.uuid("Funcionário inválido.");
+
+export const employeeListQuerySchema = z.object({
+  query: z.string().trim().max(100).catch(""),
+  status: z.enum(employeeStatusValues).optional().catch(undefined),
+  page: z.coerce.number().int().positive().catch(1),
+});

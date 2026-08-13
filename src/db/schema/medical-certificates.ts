@@ -2,6 +2,7 @@ import { date, index, integer, pgTable, text, timestamp, uuid, varchar } from "d
 import { absences } from "./absences";
 import { employees } from "./employees";
 import { users } from "./users";
+import { medicalCertificateStatusEnum } from "./enums";
 
 export const medicalCertificates = pgTable("medical_certificates", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -14,9 +15,11 @@ export const medicalCertificates = pgTable("medical_certificates", {
   fileName: varchar("file_name", { length: 255 }).notNull(),
   contentType: varchar("content_type", { length: 100 }).notNull(),
   fileSize: integer("file_size").notNull(),
+  status: medicalCertificateStatusEnum("status").notNull().default("APPROVED"),
   uploadedBy: uuid("uploaded_by").notNull().references(() => users.id, { onDelete: "restrict" }),
-  approvedBy: uuid("approved_by").notNull().references(() => users.id, { onDelete: "restrict" }),
-  approvedAt: timestamp("approved_at", { withTimezone: true }).notNull().defaultNow(),
+  approvedBy: uuid("approved_by").references(() => users.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  reviewReason: text("review_reason"),
   retentionUntil: date("retention_until", { mode: "string" }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [index("medical_certificates_employee_idx").on(table.employeeId), index("medical_certificates_absence_idx").on(table.absenceId), index("medical_certificates_period_idx").on(table.startDate, table.endDate)]);

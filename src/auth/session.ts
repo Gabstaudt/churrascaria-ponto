@@ -20,3 +20,15 @@ export async function requireAdmin() {
   if (session.user.role !== "ADMIN") redirect("/acesso-negado");
   return session;
 }
+
+export async function requireEmployeePortal() {
+  const session = await requireSession();
+  if (session.user.role !== "EMPLOYEE" || !session.user.employeeId) redirect("/acesso-negado");
+  return { ...session, employeeId: session.user.employeeId };
+}
+
+export async function requireManagerPortal() {
+  const session = await requireSession();
+  if (session.user.role !== "MANAGER") redirect("/acesso-negado");
+  return session;
+}

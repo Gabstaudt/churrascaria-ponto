@@ -1,9 +1,13 @@
-import { requireAdmin } from "@/auth/session";
+import { getSession } from "@/auth/session";
 import { getMedicalCertificateDownload } from "@/services/medical-certificate.service";
+import { managedEmployeeIds } from "@/services/portal.service";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  await requireAdmin();
-  const { id } = await params; const url = await getMedicalCertificateDownload(id);
-  if (!url) return new Response("Atestado não encontrado.", { status: 404 });
-  return Response.redirect(url, 307);
+  const session = await getSession();
+  if (!session || !session.user.isActive) return new Response("Não autorizado.", { status: 401 });
+  const { id } = await params; const file = await getMedicalCertificateDownload(id);
+  if (!file) return new Response("Atestado não encontrado.", { status: 404 });
+  const allowed = session.user.role === "ADMIN" || (session.user.role === "EMPLOYEE" && session.user.employeeId === file.employeeId) || (session.user.role === "MANAGER" && (await managedEmployeeIds(session.user.id)).includes(file.employeeId));
+  if (!allowed) return new Response("Acesso negado.", { status: 403 });
+  return Response.redirect(file.url, 307);
 }

@@ -24,7 +24,7 @@ export async function prepareMedicalCertificateUpload(input: MedicalCertificateU
   return { key, uploadUrl, expiresInSeconds: 300, uploadedBy };
 }
 
-export async function confirmMedicalCertificate(input: MedicalCertificateUploadInput & { fileKey: string }, performedBy: string) {
+export async function confirmMedicalCertificate(input: MedicalCertificateUploadInput & { fileKey: string }, performedBy: string, pendingReview = false) {
   const expectedPrefix = `medical-certificates/${input.employeeId}/`;
   if (!input.fileKey.startsWith(expectedPrefix) || input.fileKey.includes("..")) throw new Error("Chave de arquivo inválida.");
   const object = await inspectPrivateObject(input.fileKey);
@@ -45,7 +45,7 @@ export async function confirmMedicalCertificate(input: MedicalCertificateUploadI
         const [absence] = await tx.select({ id: absences.id }).from(absences).where(and(eq(absences.employeeId, input.employeeId), gte(absences.date, input.startDate), lte(absences.date, input.endDate))).limit(1);
         linkedAbsenceId = absence?.id;
       }
-      for (const date of datesBetween(input.startDate, input.endDate)) {
+      if (!pendingReview) for (const date of datesBetween(input.startDate, input.endDate)) {
         const [current] = await tx.select().from(absences).where(and(eq(absences.employeeId, input.employeeId), eq(absences.date, date))).limit(1);
         const [absence] = current
           ? await tx.update(absences).set({ decision: "MEDICAL_CERTIFICATE", decidedBy: performedBy, decidedAt: new Date() }).where(eq(absences.id, current.id)).returning()
@@ -54,9 +54,9 @@ export async function confirmMedicalCertificate(input: MedicalCertificateUploadI
         if (!linkedAbsenceId) linkedAbsenceId = absence.id;
         await tx.insert(absenceJustifications).values({ absenceId: absence.id, decision: "MEDICAL_CERTIFICATE", reason: "Atestado médico anexado e aprovado pelo administrador.", approvedBy: performedBy });
       }
-      const [saved] = await tx.insert(medicalCertificates).values({ employeeId: input.employeeId, absenceId: linkedAbsenceId, startDate: input.startDate, endDate: input.endDate, description: input.description || null, fileKey: input.fileKey, fileName: input.fileName, contentType: input.contentType, fileSize: input.fileSize, uploadedBy: performedBy, approvedBy: performedBy, retentionUntil: retentionDate(input.endDate) }).returning();
+      const [saved] = await tx.insert(medicalCertificates).values({ employeeId: input.employeeId, absenceId: linkedAbsenceId, startDate: input.startDate, endDate: input.endDate, description: input.description || null, fileKey: input.fileKey, fileName: input.fileName, contentType: input.contentType, fileSize: input.fileSize, status: pendingReview ? "PENDING" : "APPROVED", uploadedBy: performedBy, approvedBy: pendingReview ? null : performedBy, approvedAt: pendingReview ? null : new Date(), retentionUntil: retentionDate(input.endDate) }).returning();
       if (!saved) throw new Error("Não foi possível registrar o atestado.");
-      await recordAudit(tx, { action: "CREATE_MEDICAL_CERTIFICATE", entity: "MedicalCertificate", entityId: saved.id, performedBy, after: { employeeId: saved.employeeId, absenceId: saved.absenceId, startDate: saved.startDate, endDate: saved.endDate, contentType: saved.contentType, fileSize: saved.fileSize, retentionUntil: saved.retentionUntil }, reason: "Atestado anexado e aprovado pelo administrador" });
+      await recordAudit(tx, { action: pendingReview ? "SUBMIT_MEDICAL_CERTIFICATE" : "CREATE_MEDICAL_CERTIFICATE", entity: "MedicalCertificate", entityId: saved.id, performedBy, after: { employeeId: saved.employeeId, absenceId: saved.absenceId, startDate: saved.startDate, endDate: saved.endDate, contentType: saved.contentType, fileSize: saved.fileSize, status: saved.status, retentionUntil: saved.retentionUntil }, reason: pendingReview ? "Atestado enviado para análise" : "Atestado anexado e aprovado pelo administrador" });
       return saved;
     });
   } catch (error) {
@@ -66,13 +66,35 @@ export async function confirmMedicalCertificate(input: MedicalCertificateUploadI
 }
 
 export async function listMedicalCertificates(input: { employeeId?: string } = {}) {
-  return db.select({ id: medicalCertificates.id, employeeId: medicalCertificates.employeeId, employeeName: employees.fullName, registrationNumber: employees.registrationNumber, absenceId: medicalCertificates.absenceId, startDate: medicalCertificates.startDate, endDate: medicalCertificates.endDate, description: medicalCertificates.description, fileName: medicalCertificates.fileName, contentType: medicalCertificates.contentType, fileSize: medicalCertificates.fileSize, approvedAt: medicalCertificates.approvedAt, approvedByName: users.name, retentionUntil: medicalCertificates.retentionUntil })
-    .from(medicalCertificates).innerJoin(employees, eq(employees.id, medicalCertificates.employeeId)).innerJoin(users, eq(users.id, medicalCertificates.approvedBy))
+  return db.select({ id: medicalCertificates.id, employeeId: medicalCertificates.employeeId, employeeName: employees.fullName, registrationNumber: employees.registrationNumber, absenceId: medicalCertificates.absenceId, startDate: medicalCertificates.startDate, endDate: medicalCertificates.endDate, description: medicalCertificates.description, fileName: medicalCertificates.fileName, contentType: medicalCertificates.contentType, fileSize: medicalCertificates.fileSize, status: medicalCertificates.status, approvedAt: medicalCertificates.approvedAt, approvedByName: users.name, retentionUntil: medicalCertificates.retentionUntil })
+    .from(medicalCertificates).innerJoin(employees, eq(employees.id, medicalCertificates.employeeId)).leftJoin(users, eq(users.id, medicalCertificates.approvedBy))
     .where(input.employeeId ? eq(medicalCertificates.employeeId, input.employeeId) : undefined).orderBy(desc(medicalCertificates.createdAt));
 }
 
 export async function getMedicalCertificateDownload(id: string) {
-  const [item] = await db.select({ fileKey: medicalCertificates.fileKey, fileName: medicalCertificates.fileName }).from(medicalCertificates).where(eq(medicalCertificates.id, id)).limit(1);
+  const [item] = await db.select({ employeeId: medicalCertificates.employeeId, fileKey: medicalCertificates.fileKey, fileName: medicalCertificates.fileName }).from(medicalCertificates).where(eq(medicalCertificates.id, id)).limit(1);
   if (!item) return undefined;
-  return createPrivateDownloadUrl(item.fileKey, item.fileName);
+  return { employeeId: item.employeeId, url: await createPrivateDownloadUrl(item.fileKey, item.fileName) };
+}
+
+export async function reviewMedicalCertificate(id: string, decision: "APPROVED" | "REJECTED", reason: string, performedBy: string, allowedEmployeeIds?: string[]) {
+  return db.transaction(async (tx) => {
+    const [current] = await tx.select().from(medicalCertificates).where(and(eq(medicalCertificates.id, id), eq(medicalCertificates.status, "PENDING"))).limit(1);
+    if (!current || (allowedEmployeeIds && !allowedEmployeeIds.includes(current.employeeId))) return undefined;
+    if (decision === "APPROVED") {
+      await assertPeriodRangeMutable(tx, current.startDate, current.endDate);
+      let linkedAbsenceId = current.absenceId;
+      for (const date of datesBetween(current.startDate, current.endDate)) {
+        const [existing] = await tx.select().from(absences).where(and(eq(absences.employeeId, current.employeeId), eq(absences.date, date))).limit(1);
+        const [absence] = existing ? await tx.update(absences).set({ decision: "MEDICAL_CERTIFICATE", decidedBy: performedBy, decidedAt: new Date() }).where(eq(absences.id, existing.id)).returning() : await tx.insert(absences).values({ employeeId: current.employeeId, date, decision: "MEDICAL_CERTIFICATE", decidedBy: performedBy }).returning();
+        if (!absence) throw new Error("Não foi possível justificar a ausência.");
+        if (!linkedAbsenceId) linkedAbsenceId = absence.id;
+        await tx.insert(absenceJustifications).values({ absenceId: absence.id, decision: "MEDICAL_CERTIFICATE", reason: `Atestado aprovado: ${reason}`, approvedBy: performedBy });
+      }
+      await tx.update(medicalCertificates).set({ absenceId: linkedAbsenceId }).where(eq(medicalCertificates.id, id));
+    }
+    const [saved] = await tx.update(medicalCertificates).set({ status: decision, approvedBy: performedBy, approvedAt: new Date(), reviewReason: reason }).where(eq(medicalCertificates.id, id)).returning();
+    await recordAudit(tx, { action: decision === "APPROVED" ? "APPROVE_MEDICAL_CERTIFICATE" : "REJECT_MEDICAL_CERTIFICATE", entity: "MedicalCertificate", entityId: id, performedBy, before: { status: current.status }, after: { status: decision }, reason });
+    return { saved, requestedBy: current.uploadedBy };
+  });
 }

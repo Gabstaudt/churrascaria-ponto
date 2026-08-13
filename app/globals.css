@@ -329,6 +329,34 @@ a { color: inherit; text-decoration: none; }
 .employee-profile-main .employee-profile-field:nth-last-child(-n + 2) { border-bottom: 0; }
 .employee-profile-side .employee-profile-card { width: 100%; }
 .employee-profile-side .employee-profile-documents { min-height: 10rem; }
+.employee-profile-tabs { display: flex; gap: .35rem; margin-top: 1rem; padding: .35rem; overflow-x: auto; border: 1px solid var(--line); border-radius: .8rem; background: #e9ede9; scrollbar-width: thin; }
+.employee-profile-tabs a { display: inline-flex; flex: 0 0 auto; min-height: 2.55rem; align-items: center; justify-content: center; gap: .4rem; padding: 0 .8rem; border-radius: .6rem; color: var(--muted); font-size: .77rem; font-weight: 800; white-space: nowrap; }
+.employee-profile-tabs a.active { background: white; color: var(--brand); box-shadow: 0 2px 7px rgb(24 32 27 / 8%); }
+.employee-tab-panel { margin-top: 1rem; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: white; box-shadow: 0 4px 20px rgb(24 32 27 / 3%); }
+.employee-tab-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.employee-tab-panel > header h2 { margin: 0 0 .15rem; font-size: 1rem; }
+.employee-tab-panel > header p { margin: 0; color: var(--muted); font-size: .78rem; }
+.employee-tab-panel > header > div:last-child { display: flex; align-items: center; gap: .55rem; }
+.employee-related-list { display: grid; }
+.employee-related-list > a, .employee-document-row { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) auto; align-items: center; gap: .8rem; min-height: 4.5rem; padding: .8rem 1.2rem; border-bottom: 1px solid #edf0ed; }
+.employee-related-list > :last-child { border-bottom: 0; }
+.employee-related-list > a > span, .employee-document-row > span { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border-radius: .65rem; background: #e7f0e9; color: var(--brand); }
+.employee-related-list > a > div, .employee-document-row > div { display: grid; min-width: 0; gap: .2rem; }
+.employee-related-list small, .employee-document-row small { overflow: hidden; color: var(--muted); font-size: .74rem; text-overflow: ellipsis; white-space: nowrap; }
+.employee-related-list em, .employee-document-row em { color: var(--brand); font-size: .72rem; font-style: normal; font-weight: 800; }
+.employee-tab-empty { display: flex; min-height: 18rem; align-items: center; justify-content: center; flex-direction: column; padding: 2rem; color: var(--muted); text-align: center; }
+.employee-tab-empty > span { display: grid; width: 3.3rem; height: 3.3rem; place-items: center; border-radius: .85rem; background: #e7f0e9; color: var(--brand); }
+.employee-tab-empty h2 { margin: .8rem 0 .35rem; color: var(--ink); font-size: 1rem; }
+.employee-tab-empty p { max-width: 30rem; margin: 0 0 1rem; font-size: .8rem; line-height: 1.55; }
+.employee-availability-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; padding: 1rem; }
+.employee-related-group { overflow: hidden; border: 1px solid var(--line); border-radius: .75rem; }
+.employee-related-group > header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .55rem; padding: .7rem .8rem; border-bottom: 1px solid var(--line); background: #fafbfa; color: var(--brand); }
+.employee-related-group h3 { margin: 0; color: var(--ink); font-size: .82rem; }
+.employee-related-group header span { display: grid; min-width: 1.5rem; height: 1.5rem; place-items: center; border-radius: 999px; background: #e7f0e9; font-size: .65rem; font-weight: 850; }
+.employee-related-group > div { display: grid; gap: .2rem; padding: .7rem .8rem; border-bottom: 1px solid #edf0ed; }
+.employee-related-group > div:last-child { border-bottom: 0; }
+.employee-related-group strong { font-size: .78rem; }
+.employee-related-group small { overflow-wrap: anywhere; color: var(--muted); font-size: .71rem; line-height: 1.4; }
 
 /* Modern schedule journey */
 .schedules-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
@@ -375,6 +403,10 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 760px) {
   .employee-profile-layout, .employee-profile-main .employee-profile-fields, .employee-profile-side { grid-template-columns: 1fr; }
   .employee-profile-main .employee-profile-field:nth-last-child(2) { border-bottom: 1px solid #edf0ed; }
+  .employee-tab-panel > header { align-items: stretch; flex-direction: column; }
+  .employee-tab-panel > header > div:last-child { display: grid; grid-template-columns: 1fr; }
+  .employee-tab-panel > header a { width: 100%; justify-content: center; }
+  .employee-availability-groups { grid-template-columns: 1fr; }
   .employee-profile-avatar { flex-basis: 3.2rem; width: 3.2rem; height: 3.2rem; }
   .schedules-heading { align-items: stretch; flex-direction: column; gap: 1.25rem; }
   .schedules-heading .action-button { width: 100%; }
@@ -391,6 +423,8 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 430px) {
   .employee-profile-person { flex-direction: column; }
+  .employee-related-list > a, .employee-document-row { grid-template-columns: 2.4rem minmax(0, 1fr); }
+  .employee-related-list em, .employee-document-row em { grid-column: 2; }
   .schedule-form-header > span { display: none; }
   .schedule-form .schedule-meta-grid, .schedule-form .schedule-time-grid { grid-template-columns: 1fr; }
   .schedule-form .schedule-time-grid label:last-child { grid-column: auto; }
@@ -398,6 +432,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Sprint 6: operational calendar and date exceptions */
 .calendar-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.calendar-page .page-heading-actions { display: flex; align-items: center; gap: .6rem; }
 .calendar-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
 .calendar-heading h1 { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -.045em; }
 .calendar-heading > div > p:last-child { max-width: 42rem; margin: .65rem 0 0; color: var(--muted); line-height: 1.55; }
@@ -430,6 +465,8 @@ a { color: inherit; text-decoration: none; }
 .calendar-situation { justify-self: start; padding: .32rem .55rem; border-radius: 999px; font-size: .69rem; font-weight: 850; }
 .situation-work { background: #e5f2e9; color: #286443; }
 .situation-off { background: #e8eef8; color: #395f8d; }
+.situation-vacation { background: #fff2d9; color: #805911; }
+.situation-leave { background: #f1e9f8; color: #684783; }
 .situation-no_schedule { background: #eef0ee; color: #5d6660; }
 .calendar-adjust { display: inline-flex; align-items: center; gap: .35rem; color: var(--brand); font-size: .75rem; font-weight: 800; }
 .exception-body { display: grid; gap: 1.2rem; padding: 1.25rem; }
@@ -456,6 +493,8 @@ a { color: inherit; text-decoration: none; }
   .sidebar .admin-navigation { grid-template-columns: repeat(4, 1fr); }
   .calendar-heading { align-items: stretch; flex-direction: column; gap: 1.2rem; }
   .calendar-heading .action-button { width: 100%; }
+  .calendar-page .page-heading-actions { display: grid; grid-template-columns: 1fr; }
+  .calendar-page .page-heading-actions > a { width: 100%; justify-content: center; }
   .calendar-controls { align-items: stretch; flex-direction: column; }
   .calendar-view-tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
   .calendar-view-tabs a { min-width: 0; }
@@ -472,4 +511,105 @@ a { color: inherit; text-decoration: none; }
   .calendar-filters > span { grid-column: auto; }
   .calendar-date > header { align-items: flex-start; }
   .calendar-date > header div { display: grid; gap: .15rem; }
+}
+
+/* Sprint 7: scoped availability screens, reusing the administrative layout. */
+.availability-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.availability-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; margin-top: 2rem; }
+.availability-section { margin-top: 0; border-radius: 1rem; }
+.availability-section > header { display: grid; grid-template-columns: 2.35rem minmax(0, 1fr) auto; align-items: center; gap: .75rem; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.availability-section > header > span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border-radius: .65rem; background: #e6efe8; color: var(--brand); }
+.availability-section h2 { margin: 0 0 .15rem; font-size: 1rem; }
+.availability-section header p { margin: 0; color: var(--muted); font-size: .75rem; }
+.availability-section header em { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 999px; background: #e7f0e9; color: var(--brand); font-size: .75rem; font-style: normal; font-weight: 850; }
+.availability-records { display: grid; }
+.availability-record { display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(12rem, 1.2fr) auto; align-items: center; gap: .8rem; padding: 1rem 1.15rem; border-bottom: 1px solid #edf0ed; }
+.availability-record:last-child { border-bottom: 0; }
+.availability-record.simple { grid-template-columns: minmax(9rem, 1fr) minmax(12rem, 1.2fr); }
+.availability-record > div { display: grid; min-width: 0; gap: .2rem; }
+.availability-record small { color: var(--muted); font-size: .72rem; }
+.availability-record p { margin: .1rem 0 0; overflow-wrap: anywhere; color: var(--muted); font-size: .75rem; line-height: 1.4; }
+.availability-empty { padding: 2rem 1rem; color: var(--muted); font-size: .82rem; text-align: center; }
+.availability-alert { margin-top: 1rem; }
+.swap-status { padding: .3rem .55rem; border-radius: 999px; font-size: .68rem; font-weight: 850; }
+.swap-status.status-pending { background: #fff2d9; color: #805911; }
+.swap-status.status-approved { background: #e5f2e9; color: #286443; }
+.swap-status.status-rejected { background: #fff0ef; color: #9f312a; }
+.swap-review { display: grid; grid-column: 1 / -1; grid-template-columns: minmax(10rem, 1fr) auto auto; gap: .5rem; padding-top: .75rem; border-top: 1px solid #edf0ed; }
+.swap-review input { min-width: 0; min-height: 2.5rem; padding: 0 .7rem; border: 1px solid var(--line); border-radius: .55rem; }
+.swap-review button { padding: 0 .8rem; border: 0; border-radius: .55rem; background: var(--brand); color: white; font-weight: 800; cursor: pointer; }
+.swap-review button.reject { border: 1px solid #e2b7b3; background: #fff7f6; color: #9f312a; }
+.availability-kind { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; padding: 1rem; }
+.availability-kind label { display: flex; min-height: 3.5rem; align-items: center; gap: .55rem; padding: .8rem; border: 1px solid var(--line); border-radius: .7rem; background: #fafbfa; cursor: pointer; }
+.availability-kind label.selected { border-color: var(--brand); background: #edf4ef; color: var(--brand); }
+.availability-kind input { width: auto; min-height: auto; }
+.availability-fields { padding: 1.25rem; }
+.availability-form textarea { width: 100%; resize: vertical; padding: .8rem; border: 1px solid var(--line); border-radius: .65rem; background: #fcfdfc; color: var(--ink); font: inherit; }
+.availability-form textarea:focus { border-color: var(--brand); outline: 0; box-shadow: 0 0 0 3px rgb(49 95 72 / 10%); }
+
+@media (max-width: 900px) {
+  .availability-grid { grid-template-columns: 1fr; }
+  .availability-kind { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .availability-record, .availability-record.simple { grid-template-columns: 1fr; }
+  .swap-status { justify-self: start; }
+  .swap-review { grid-template-columns: 1fr; }
+  .swap-review button { min-height: 2.5rem; }
+  .availability-kind { grid-template-columns: 1fr; }
+}
+
+/* Employee hub refinements: isolated to the detailed profile. */
+.employee-profile-page > .back-link { margin-bottom: 1rem; }
+.employee-profile-page .employee-profile-hero { padding: 1.25rem 1.35rem; border-top: 3px solid var(--brand); box-shadow: 0 5px 18px rgb(24 32 27 / 3%); }
+.employee-profile-page .employee-profile-avatar { border-radius: 50%; box-shadow: 0 0 0 4px #edf3ee; }
+.employee-profile-page .employee-profile-title p { align-items: center; font-size: .84rem; }
+.employee-profile-page .employee-profile-actions .secondary-button,
+.employee-profile-page .employee-profile-actions .danger-button { min-height: 2.65rem; }
+.employee-profile-page .employee-profile-tabs { display: grid; grid-template-columns: repeat(5, minmax(max-content, 1fr)); padding: .3rem; background: #e9ede9; }
+.employee-profile-page .employee-profile-tabs a { width: 100%; padding-inline: .65rem; }
+.employee-profile-page .employee-profile-layout { grid-template-columns: minmax(0, 1.7fr) minmax(17rem, .8fr); gap: .85rem; margin-top: .85rem; }
+.employee-profile-page .employee-profile-main,
+.employee-profile-page .employee-profile-side { gap: .85rem; }
+.employee-profile-page .employee-profile-card { border-radius: .85rem; box-shadow: 0 3px 14px rgb(24 32 27 / 2.5%); }
+.employee-profile-page .employee-profile-card > header { min-height: 4.2rem; padding: .85rem 1rem; }
+.employee-profile-page .employee-profile-card dl { padding-inline: 1rem; }
+.employee-profile-page .employee-profile-field { min-height: 4.1rem; justify-content: center; padding: .65rem 0; }
+.employee-profile-page .employee-summary-card dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; padding: .8rem; }
+.employee-profile-page .employee-summary-card .employee-profile-field { min-height: 4.8rem; align-content: center; justify-items: center; padding: .55rem .35rem; border: 1px solid var(--line); border-radius: .65rem; background: #fafbfa; text-align: center; }
+.employee-profile-page .employee-summary-card .employee-profile-field dt { justify-content: center; font-size: .65rem; }
+.employee-profile-page .employee-summary-card .employee-profile-field dd { color: var(--brand); font-size: 1.25rem; }
+.employee-profile-page .employee-tab-panel { margin-top: .85rem; border-radius: .85rem; }
+.employee-profile-page .employee-tab-panel > header { min-height: 4.5rem; padding: .85rem 1rem; }
+.employee-profile-page .employee-tab-empty { min-height: 16rem; }
+.employee-profile-page .employee-availability-groups { gap: .7rem; padding: .85rem; }
+
+@media (max-width: 1000px) {
+  .employee-profile-page .employee-profile-hero { align-items: flex-start; }
+  .employee-profile-page .employee-profile-actions { display: grid; grid-template-columns: 1fr; }
+  .employee-profile-page .employee-profile-actions > *,
+  .employee-profile-page .employee-profile-actions button { width: 100%; justify-content: center; }
+  .employee-profile-page .employee-profile-tabs { display: flex; }
+  .employee-profile-page .employee-profile-tabs a { width: auto; min-width: max-content; }
+}
+
+@media (max-width: 760px) {
+  .employee-profile-page .employee-profile-hero { gap: 1rem; padding: 1rem; }
+  .employee-profile-page .employee-profile-person { width: 100%; }
+  .employee-profile-page .employee-profile-title { flex: 1; }
+  .employee-profile-page .employee-profile-actions { width: 100%; }
+  .employee-profile-page .employee-profile-layout { gap: .7rem; margin-top: .7rem; }
+  .employee-profile-page .employee-profile-main,
+  .employee-profile-page .employee-profile-side { gap: .7rem; }
+  .employee-profile-page .employee-profile-tabs { margin-top: .7rem; }
+  .employee-profile-page .employee-tab-panel { margin-top: .7rem; }
+}
+
+@media (max-width: 430px) {
+  .employee-profile-page .employee-profile-person { flex-direction: row; }
+  .employee-profile-page .employee-profile-avatar { flex-basis: 2.9rem; width: 2.9rem; height: 2.9rem; }
+  .employee-profile-page .employee-profile-title h1 { font-size: 1.4rem; }
+  .employee-profile-page .employee-summary-card dl { grid-template-columns: 1fr; }
+  .employee-profile-page .employee-summary-card .employee-profile-field { min-height: 3.8rem; }
 }

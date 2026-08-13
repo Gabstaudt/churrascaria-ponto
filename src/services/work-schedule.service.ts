@@ -67,6 +67,11 @@ export async function listEligibleEmployees() {
   return db.select({ id: employees.id, fullName: employees.fullName, registrationNumber: employees.registrationNumber }).from(employees).where(eq(employees.isActive, true)).orderBy(asc(employees.fullName));
 }
 
+export async function listWorkSchedulesByEmployee(employeeId: string) {
+  return db.select({ id: workSchedules.id, name: workSchedules.name, validFrom: workSchedules.validFrom, validTo: workSchedules.validTo })
+    .from(workSchedules).where(eq(workSchedules.employeeId, employeeId)).orderBy(desc(workSchedules.validFrom));
+}
+
 export async function getWorkScheduleById(id: string) {
   const [schedule] = await db.select({ id: workSchedules.id, name: workSchedules.name, validFrom: workSchedules.validFrom, validTo: workSchedules.validTo, employeeId: employees.id, employeeName: employees.fullName, registrationNumber: employees.registrationNumber, position: employees.position }).from(workSchedules).innerJoin(employees, eq(employees.id, workSchedules.employeeId)).where(eq(workSchedules.id, id)).limit(1);
   if (!schedule) return undefined;

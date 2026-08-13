@@ -43,6 +43,13 @@
       "when": 1786635005463,
       "tag": "0005_fancy_ogun",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786635901904,
+      "tag": "0006_special_darkstar",
+      "breakpoints": true
     }
   ]
 }

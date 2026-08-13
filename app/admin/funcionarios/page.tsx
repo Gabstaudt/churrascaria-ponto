@@ -1,4 +1,4 @@
-import { Plus, Search, UsersRound } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, CalendarDays, Hash, Plus, Search, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 import { EmployeeStatusBadge } from "@/components/employees/employee-status-badge";
@@ -36,22 +36,26 @@ export default async function EmployeesPage({ searchParams }: PageProps<"/admin/
 
       {created ? <p className="success-message" role="status">Funcionário cadastrado com sucesso.</p> : null}
 
-      <form className="filter-bar" method="get">
-        <label className="search-field" htmlFor="query"><Search size={18} aria-hidden="true" /><input id="query" name="query" defaultValue={filters.query} placeholder="Buscar por nome, CPF, matrícula ou cargo" /></label>
-        <label className="sr-only" htmlFor="status">Status</label>
-        <select id="status" name="status" defaultValue={filters.status ?? ""}>
-          <option value="">Todos os status</option>
-          {employeeStatusValues.map((status) => <option value={status} key={status}>{statusLabels[status]}</option>)}
-        </select>
-        <button className="secondary-button" type="submit">Filtrar</button>
-      </form>
-
       <section className="data-panel" aria-label="Lista de funcionários">
-        <div className="table-summary"><strong>{result.total}</strong> {result.total === 1 ? "funcionário encontrado" : "funcionários encontrados"}</div>
+        <div className="employee-toolbar">
+          <form className="filter-bar" method="get">
+            <label className="search-field" htmlFor="query"><Search size={18} aria-hidden="true" /><input id="query" name="query" defaultValue={filters.query} placeholder="Buscar funcionário" /></label>
+            <label className="sr-only" htmlFor="status">Status</label>
+            <select id="status" name="status" defaultValue={filters.status ?? ""}>
+              <option value="">Todos os status</option>
+              {employeeStatusValues.map((status) => <option value={status} key={status}>{statusLabels[status]}</option>)}
+            </select>
+            <button className="secondary-button" type="submit">Filtrar</button>
+          </form>
+          <div className="table-summary"><strong>{result.total}</strong> {result.total === 1 ? "funcionário" : "funcionários"}</div>
+        </div>
         {result.items.length ? (
-          <div className="table-scroll"><table className="data-table"><thead><tr><th>Funcionário</th><th>Matrícula</th><th>Cargo</th><th>Admissão</th><th>Status</th></tr></thead><tbody>{result.items.map((employee) => <tr key={employee.id}><td><strong>{employee.fullName}</strong><small>{formatCpf(employee.cpf)}</small></td><td>{employee.registrationNumber}</td><td>{employee.position}</td><td>{formatDate(employee.admissionDate)}</td><td><EmployeeStatusBadge status={employee.status} /></td></tr>)}</tbody></table></div>
+          <>
+            <div className="table-scroll desktop-employee-list"><table className="data-table"><thead><tr><th>Funcionário</th><th>Matrícula</th><th>Cargo</th><th>Admissão</th><th>Status</th></tr></thead><tbody>{result.items.map((employee) => <tr key={employee.id}><td><div className="employee-identity"><span className="employee-initials">{employee.fullName.split(" ").slice(0, 2).map((part) => part[0]).join("").toUpperCase()}</span><span><strong>{employee.fullName}</strong><small>{formatCpf(employee.cpf)}</small></span></div></td><td>{employee.registrationNumber}</td><td>{employee.position}</td><td>{formatDate(employee.admissionDate)}</td><td><EmployeeStatusBadge status={employee.status} /></td></tr>)}</tbody></table></div>
+            <div className="mobile-employee-list">{result.items.map((employee) => <article className="employee-card" key={employee.id}><header><div className="employee-identity"><span className="employee-initials">{employee.fullName.split(" ").slice(0, 2).map((part) => part[0]).join("").toUpperCase()}</span><span><strong>{employee.fullName}</strong><small>{formatCpf(employee.cpf)}</small></span></div><EmployeeStatusBadge status={employee.status} /></header><dl><div><dt><Hash size={15} /> Matrícula</dt><dd>{employee.registrationNumber}</dd></div><div><dt><BriefcaseBusiness size={15} /> Cargo</dt><dd>{employee.position}</dd></div><div><dt><CalendarDays size={15} /> Admissão</dt><dd>{formatDate(employee.admissionDate)}</dd></div></dl></article>)}</div>
+          </>
         ) : (
-          <div className="empty-state"><UsersRound size={30} /><h2>Nenhum funcionário encontrado</h2><p>Ajuste os filtros ou cadastre o primeiro funcionário.</p><Link href="/admin/funcionarios/novo">Cadastrar funcionário</Link></div>
+          <div className="empty-state"><UsersRound size={30} /><h2>Nenhum funcionário encontrado</h2><p>Ajuste os filtros ou cadastre o primeiro funcionário.</p><Link href="/admin/funcionarios/novo"><BadgeCheck size={16} /> Cadastrar funcionário</Link></div>
         )}
         {result.totalPages > 1 ? <nav className="pagination" aria-label="Paginação"><Link aria-disabled={result.page === 1} className={result.page === 1 ? "disabled" : ""} href={pageHref(result.page - 1, filters.query, filters.status)}>Anterior</Link><span>Página {result.page} de {result.totalPages}</span><Link aria-disabled={result.page >= result.totalPages} className={result.page >= result.totalPages ? "disabled" : ""} href={pageHref(result.page + 1, filters.query, filters.status)}>Próxima</Link></nav> : null}
       </section>

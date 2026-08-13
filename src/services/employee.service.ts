@@ -3,7 +3,7 @@ import "server-only";
 import { and, asc, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
-import { auditLogs, employeeDocuments, employees, users, type EmployeeStatus } from "@/db/schema";
+import { auditLogs, employeeDocuments, employees, medicalCertificates, users, type EmployeeStatus } from "@/db/schema";
 import type { EmployeeCreateInput, EmployeeUpdateInput } from "@/validations/employee";
 
 import { mapEmployeeConflict } from "./employee-errors";
@@ -78,8 +78,11 @@ export async function getEmployeeById(id: string) {
 }
 
 export async function listEmployeeDocuments(id: string) {
-  return db.select({ id: employeeDocuments.id, title: employeeDocuments.title, type: employeeDocuments.type, fileName: employeeDocuments.fileName, contentType: employeeDocuments.contentType, createdAt: employeeDocuments.createdAt })
-    .from(employeeDocuments).where(eq(employeeDocuments.employeeId, id)).orderBy(desc(employeeDocuments.createdAt));
+  const [documents, certificates] = await Promise.all([
+    db.select({ id: employeeDocuments.id, title: employeeDocuments.title, type: employeeDocuments.type, fileName: employeeDocuments.fileName, contentType: employeeDocuments.contentType, createdAt: employeeDocuments.createdAt }).from(employeeDocuments).where(eq(employeeDocuments.employeeId, id)).orderBy(desc(employeeDocuments.createdAt)),
+    db.select({ id: medicalCertificates.id, fileName: medicalCertificates.fileName, contentType: medicalCertificates.contentType, createdAt: medicalCertificates.createdAt, startDate: medicalCertificates.startDate, endDate: medicalCertificates.endDate }).from(medicalCertificates).where(eq(medicalCertificates.employeeId, id)).orderBy(desc(medicalCertificates.createdAt)),
+  ]);
+  return [...documents.map((item) => ({ ...item, downloadPath: undefined as string | undefined })), ...certificates.map((item) => ({ id: item.id, title: `Atestado · ${item.startDate} a ${item.endDate}`, type: "ATESTADO", fileName: item.fileName, contentType: item.contentType, createdAt: item.createdAt, downloadPath: `/admin/atestados/${item.id}/arquivo` }))].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
 export async function getEmployeeAuditHistory(id: string) {

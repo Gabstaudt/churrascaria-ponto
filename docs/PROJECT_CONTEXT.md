@@ -191,9 +191,9 @@ para recursos sofisticados antes de estabilizar essa fundação.
 
 ## Estado de execução
 
-As Sprints 1 a 12 foram implementadas e validadas com PostgreSQL local. O primeiro
+As Sprints 1 a 13 foram implementadas e validadas com PostgreSQL local. O primeiro
 marco funcional — autenticação e ciclo administrativo completo de funcionários —
 está concluído, e jornadas históricas já podem ser configuradas. Os detalhes
 estão registrados nos relatórios em `docs/sprints/`.
 
-O próximo trabalho planejado é a Sprint 13: atestados e Object Storage.
+O próximo trabalho planejado é a Sprint 14: motor de cálculo diário.

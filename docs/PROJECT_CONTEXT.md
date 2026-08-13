@@ -191,10 +191,10 @@ para recursos sofisticados antes de estabilizar essa fundação.
 
 ## Estado de execução
 
-A implementação da Sprint 1 foi concluída em 7 de agosto de 2026. A configuração
-Drizzle/PostgreSQL, schemas iniciais, migration, validações e testes estão
-registrados no repositório. O relatório está em `docs/sprints/SPRINT_01.md`.
+As Sprints 1 e 2 foram implementadas. A fundação PostgreSQL/Drizzle, autenticação
+Better Auth, sessões, autorização administrativa e layout protegido estão
+registrados em `docs/sprints/SPRINT_01.md` e `docs/sprints/SPRINT_02.md`.
 
-A migration ainda precisa ser aplicada a um PostgreSQL de desenvolvimento quando
-uma `DATABASE_URL` estiver disponível. Depois dessa validação de ambiente, o
-próximo trabalho planejado é a Sprint 2: autenticação e painel protegido.
+As migrations ainda precisam ser aplicadas a um PostgreSQL de desenvolvimento e
+o fluxo de login deve ser validado com persistência real. Depois dessa ativação,
+o próximo trabalho planejado é a Sprint 3: cadastro e listagem de funcionários.

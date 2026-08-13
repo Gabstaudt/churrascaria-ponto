@@ -11,3 +11,4 @@ export * from "./availability";
 export * from "./time-entries";
 export * from "./time-adjustments";
 export * from "./absences";
+export * from "./medical-certificates";

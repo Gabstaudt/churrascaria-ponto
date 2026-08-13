@@ -258,8 +258,10 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 900px) {
   .closing-list > a { grid-template-columns: auto 1fr auto; }
   .closing-list > a > div:nth-of-type(2), .closing-list > a > div:nth-of-type(3) { display: none; }
-  .closing-employees { overflow-x: auto; }
-  .closing-employees > div { min-width: 850px; }
+  .closing-employees { overflow: hidden; }
+  .closing-employees > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; padding: .75rem; }
+  .closing-employees > div > article { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; padding: .85rem; border: 1px solid var(--line); border-radius: .75rem; background: #fafbfa; }
+  .closing-employees > div > article > div { grid-column: 1 / -1; padding-bottom: .55rem; border-bottom: 1px solid var(--line); }
 }
 
 @media (max-width: 700px) {
@@ -268,6 +270,8 @@ a { color: inherit; text-decoration: none; }
   .closing-summary, .closing-totals, .closing-blockers > div { grid-template-columns: 1fr; }
   .closing-hero { align-items: flex-start; flex-direction: column; }
   .closing-actions > p { margin-left: 0; }
+  .closing-employees > div { grid-template-columns: 1fr; }
+  .closing-employees > div > article { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* Sprint 15: banco de horas; componentes isolados do layout administrativo. */

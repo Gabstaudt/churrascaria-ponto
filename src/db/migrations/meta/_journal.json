@@ -64,6 +64,13 @@
       "when": 1786641000966,
       "tag": "0008_perpetual_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786641508512,
+      "tag": "0009_rich_beyonder",
+      "breakpoints": true
     }
   ]
 }

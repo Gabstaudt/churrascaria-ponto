@@ -1,12 +1,13 @@
 import "server-only";
 
-import { and, asc, count, eq, ilike, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
-import { auditLogs, employees, type EmployeeStatus } from "@/db/schema";
+import { auditLogs, employees, users, type EmployeeStatus } from "@/db/schema";
 import type { EmployeeCreateInput, EmployeeUpdateInput } from "@/validations/employee";
 
 import { mapEmployeeConflict } from "./employee-errors";
+import { isEmployeeActiveForStatus, resolveEmployeeActivation } from "./employee-status";
 
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
@@ -74,6 +75,23 @@ export async function getEmployeeById(id: string) {
   return employee;
 }
 
+export async function getEmployeeAuditHistory(id: string) {
+  return db
+    .select({
+      id: auditLogs.id,
+      action: auditLogs.action,
+      before: auditLogs.before,
+      after: auditLogs.after,
+      reason: auditLogs.reason,
+      createdAt: auditLogs.createdAt,
+      performedByName: users.name,
+    })
+    .from(auditLogs)
+    .innerJoin(users, eq(users.id, auditLogs.performedBy))
+    .where(and(eq(auditLogs.entity, "Employee"), eq(auditLogs.entityId, id)))
+    .orderBy(desc(auditLogs.createdAt));
+}
+
 function auditSnapshot(employee: typeof employees.$inferSelect) {
   return {
     id: employee.id,
@@ -98,7 +116,7 @@ export async function updateEmployee(id: string, input: EmployeeUpdateInput, per
       const [current] = await tx.select().from(employees).where(eq(employees.id, id)).limit(1);
       if (!current) return undefined;
 
-      const isActive = input.status !== "INACTIVE" && input.status !== "TERMINATED";
+      const isActive = isEmployeeActiveForStatus(input.status);
       const [updated] = await tx
         .update(employees)
         .set({ ...input, isActive, updatedAt: new Date() })
@@ -127,9 +145,10 @@ export async function setEmployeeActive(id: string, active: boolean, performedBy
   return db.transaction(async (tx) => {
     const [current] = await tx.select().from(employees).where(eq(employees.id, id)).limit(1);
     if (!current) return undefined;
+    const activation = resolveEmployeeActivation(active);
     const [updated] = await tx
       .update(employees)
-      .set({ isActive: active, status: active ? "ACTIVE" : "INACTIVE", updatedAt: new Date() })
+      .set({ ...activation, updatedAt: new Date() })
       .where(eq(employees.id, id))
       .returning();
     if (!updated) throw new Error("Não foi possível alterar o funcionário.");

@@ -191,9 +191,8 @@ para recursos sofisticados antes de estabilizar essa fundação.
 
 ## Estado de execução
 
-As Sprints 1, 2 e 3 foram implementadas e validadas com PostgreSQL local. A
-fundação Drizzle, autenticação, autorização administrativa e cadastro/listagem de
-funcionários estão registrados nos relatórios em `docs/sprints/`.
+As Sprints 1 a 4 foram implementadas e validadas com PostgreSQL local. O primeiro
+marco funcional — autenticação e ciclo administrativo completo de funcionários —
+está concluído e registrado nos relatórios em `docs/sprints/`.
 
-O próximo trabalho planejado é a Sprint 4: detalhe, edição, status, inativação e
-reativação de funcionários, concluindo o primeiro marco funcional.
+O próximo trabalho planejado é a Sprint 5: jornadas com vigência histórica.

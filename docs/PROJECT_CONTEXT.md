@@ -189,8 +189,12 @@ para recursos sofisticados antes de estabilizar essa fundação.
 - `package.json` e `package-lock.json` já tinham alterações locais antes desta
   consolidação; elas devem ser preservadas.
 
-## Próxima ação autorizada pelo contexto, mas ainda não executada
+## Estado de execução
 
-Iniciar somente a fundação de banco da Fase 1: `drizzle.config`, conexão isolada
-no servidor em `src/db`, schemas iniciais de `users` e `employees`, migrations e
-`.env.example`; depois validar compilação, TypeScript e lint e parar para revisão.
+A implementação da Sprint 1 foi concluída em 7 de agosto de 2026. A configuração
+Drizzle/PostgreSQL, schemas iniciais, migration, validações e testes estão
+registrados no repositório. O relatório está em `docs/sprints/SPRINT_01.md`.
+
+A migration ainda precisa ser aplicada a um PostgreSQL de desenvolvimento quando
+uma `DATABASE_URL` estiver disponível. Depois dessa validação de ambiente, o
+próximo trabalho planejado é a Sprint 2: autenticação e painel protegido.

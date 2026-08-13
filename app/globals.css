@@ -481,6 +481,66 @@ a { color: inherit; text-decoration: none; }
   .time-entry-origin { display: none; }
 }
 
+/* Sprint 9: operational dashboard, scoped to /admin. */
+.operational-page { width: 100%; max-width: 1280px; margin-inline: auto; }
+.operational-date { display: flex; align-items: end; gap: .55rem; }
+.operational-date label { display: grid; gap: .35rem; color: var(--muted); font-size: .72rem; font-weight: 800; }
+.operational-date label svg { display: none; }
+.operational-date input { min-height: 2.7rem; padding: 0 .7rem; border: 1px solid var(--line); border-radius: .6rem; background: white; color: var(--ink); }
+.operational-date button { min-height: 2.7rem; padding: 0 .9rem; border: 0; border-radius: .6rem; background: var(--brand); color: white; font-weight: 800; cursor: pointer; }
+.operational-summary { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .7rem; margin-top: 2rem; }
+.operational-summary article { display: flex; min-width: 0; align-items: center; gap: .7rem; padding: .9rem; border: 1px solid var(--line); border-radius: .8rem; background: white; }
+.operational-summary article > span { display: grid; flex: 0 0 2.35rem; width: 2.35rem; height: 2.35rem; place-items: center; border-radius: .65rem; background: #eef1ee; color: var(--muted); }
+.operational-summary article > div { display: grid; min-width: 0; }
+.operational-summary strong { font-size: 1.2rem; }
+.operational-summary small { overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
+.operational-summary .tone-success > span { background: #e5f2e9; color: #286443; }
+.operational-summary .tone-warning > span { background: #fff2d9; color: #805911; }
+.operational-summary .tone-danger > span { background: #fff0ef; color: #9f312a; }
+.operational-summary .tone-info > span { background: #e8f1fb; color: #285c8e; }
+.operational-panel { margin-top: 1rem; border-radius: 1rem; }
+.operational-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1.1rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.operational-panel > header h2 { margin: 0 0 .15rem; font-size: 1rem; }
+.operational-panel > header p { margin: 0; color: var(--muted); font-size: .75rem; }
+.operational-panel > header > span { color: var(--muted); font-size: .75rem; }
+.operational-list { display: grid; }
+.operational-list article { display: grid; grid-template-columns: minmax(12rem, 1.2fr) minmax(9rem, .8fr) minmax(13rem, 1.2fr) auto auto; align-items: center; gap: .8rem; min-height: 5rem; padding: .8rem 1.1rem; border-bottom: 1px solid #edf0ed; }
+.operational-list article:last-child { border-bottom: 0; }
+.operational-person, .operational-planned, .operational-actual { display: grid; min-width: 0; gap: .2rem; }
+.operational-person small, .operational-planned small, .operational-actual small { overflow: hidden; color: var(--muted); font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
+.operational-actual strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.operational-actual em { color: #9f312a; font-size: .67rem; font-style: normal; font-weight: 800; }
+.daily-status { justify-self: start; padding: .32rem .55rem; border-radius: 999px; font-size: .67rem; font-weight: 850; white-space: nowrap; }
+.daily-present { background: #e5f2e9; color: #286443; }
+.daily-late, .daily-expected { background: #fff2d9; color: #805911; }
+.daily-incomplete, .daily-possible_absence { background: #fff0ef; color: #9f312a; }
+.daily-off, .daily-vacation, .daily-leave { background: #e8f1fb; color: #285c8e; }
+.daily-no_schedule { background: #eef0ee; color: #5d6660; }
+.operational-check { display: inline-flex; align-items: center; gap: .35rem; color: var(--brand); font-size: .72rem; font-weight: 800; }
+.operational-note { margin: 1rem 0 0; padding: .8rem 1rem; border: 1px solid #ead5a7; border-radius: .7rem; background: #fff9eb; color: #705520; font-size: .76rem; line-height: 1.5; }
+
+@media (max-width: 1120px) {
+  .operational-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .operational-list article { grid-template-columns: minmax(12rem, 1fr) minmax(9rem, .8fr) minmax(12rem, 1fr) auto; }
+  .operational-check { grid-column: 4; }
+}
+
+@media (max-width: 800px) {
+  .operational-date { width: 100%; }
+  .operational-date label { flex: 1; }
+  .operational-date input { width: 100%; }
+  .operational-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.25rem; }
+  .operational-list article { grid-template-columns: minmax(0, 1fr) auto; }
+  .operational-planned, .operational-actual { grid-column: 1 / -1; padding-top: .55rem; border-top: 1px solid #edf0ed; }
+  .operational-check { grid-column: 1 / -1; justify-content: center; min-height: 2.4rem; border: 1px solid var(--line); border-radius: .55rem; }
+}
+
+@media (max-width: 480px) {
+  .operational-date { display: grid; grid-template-columns: 1fr; }
+  .operational-summary { grid-template-columns: 1fr; }
+  .operational-summary article { min-height: 4rem; }
+}
+
 /* Sprint 6: operational calendar and date exceptions */
 .calendar-page { width: 100%; max-width: 1180px; margin-inline: auto; }
 .calendar-page .page-heading-actions { display: flex; align-items: center; gap: .6rem; }

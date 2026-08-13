@@ -2,9 +2,10 @@ import "server-only";
 
 import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLogs, timeAdjustments, timeEntries, users } from "@/db/schema";
+import { timeAdjustments, timeEntries, users } from "@/db/schema";
 import type { TimeAdjustmentInput } from "@/validations/time-adjustment";
 import { officialDateTime } from "./daily-attendance-core";
+import { recordAudit } from "./audit.service";
 
 export class InvalidOriginalEntryError extends Error { constructor() { super("A marcação original não pertence ao funcionário e à data informados."); this.name = "InvalidOriginalEntryError"; } }
 
@@ -17,7 +18,7 @@ export async function createTimeAdjustment(input: TimeAdjustmentInput, performed
     }
     const [saved] = await tx.insert(timeAdjustments).values({ employeeId: input.employeeId, date: input.date, type: input.type, adjustedAt: input.time ? officialDateTime(input.date, input.time) : null, originalTimeEntryId: input.originalTimeEntryId, reason: input.reason, performedBy }).returning();
     if (!saved) throw new Error("Não foi possível registrar o tratamento.");
-    await tx.insert(auditLogs).values({ action: "CREATE_TIME_ADJUSTMENT", entity: "TimeAdjustment", entityId: saved.id, performedBy, after: saved, reason: input.reason });
+    await recordAudit(tx, { action: "CREATE_TIME_ADJUSTMENT", entity: "TimeAdjustment", entityId: saved.id, performedBy, after: saved, reason: input.reason });
     return saved;
   });
 }

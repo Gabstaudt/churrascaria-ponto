@@ -2,9 +2,10 @@ import "server-only";
 
 import { and, asc, eq, gte, inArray, isNull, lte, or } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLogs, dayOffSwaps, daysOff, employees, leavePeriods, scheduleDays, scheduleExceptions, vacations, workSchedules } from "@/db/schema";
+import { dayOffSwaps, daysOff, employees, leavePeriods, scheduleDays, scheduleExceptions, vacations, workSchedules } from "@/db/schema";
 import type { ScheduleExceptionInput } from "@/validations/schedule-exception";
 import { resolveScheduleDay, type CalendarSituation } from "./schedule-resolution";
+import { recordAudit } from "./audit.service";
 
 export type { CalendarSituation } from "./schedule-resolution";
 
@@ -55,7 +56,7 @@ export async function saveScheduleException(input: ScheduleExceptionInput, perfo
       ? await tx.update(scheduleExceptions).set(values).where(eq(scheduleExceptions.id, existing.id)).returning()
       : await tx.insert(scheduleExceptions).values(values).returning();
     if (!saved) throw new Error("Não foi possível salvar o ajuste.");
-    await tx.insert(auditLogs).values({ action: existing ? "UPDATE_SCHEDULE_EXCEPTION" : "CREATE_SCHEDULE_EXCEPTION", entity: "ScheduleException", entityId: saved.id, performedBy, before: existing ?? null, after: saved, reason: input.reason });
+    await recordAudit(tx, { action: existing ? "UPDATE_SCHEDULE_EXCEPTION" : "CREATE_SCHEDULE_EXCEPTION", entity: "ScheduleException", entityId: saved.id, performedBy, before: existing ?? null, after: saved, reason: input.reason });
     return saved;
   });
 }

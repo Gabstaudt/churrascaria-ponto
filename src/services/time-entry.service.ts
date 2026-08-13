@@ -2,15 +2,16 @@ import "server-only";
 
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLogs, employees, timeEntries } from "@/db/schema";
+import { employees, timeEntries } from "@/db/schema";
 import type { SimulatedTimeEntriesInput } from "@/validations/time-entry";
 import { localBelemDateTime, simulatedExternalId } from "./time-entry-core";
+import { recordAudit } from "./audit.service";
 
 export async function importSimulatedTimeEntries(input: SimulatedTimeEntriesInput, performedBy: string) {
   return db.transaction(async (tx) => {
     const values = input.times.map((time) => ({ employeeId: input.employeeId, occurredAt: localBelemDateTime(input.date, time), source: "SIMULATOR" as const, externalId: simulatedExternalId(input.employeeId, input.date, time), deviceIdentifier: "development-simulator", metadata: { timezone: "America/Belem", generatedBy: performedBy } }));
     const inserted = await tx.insert(timeEntries).values(values).onConflictDoNothing({ target: [timeEntries.source, timeEntries.externalId] }).returning();
-    if (inserted.length) await tx.insert(auditLogs).values({ action: "IMPORT_SIMULATED_TIME_ENTRIES", entity: "Employee", entityId: input.employeeId, performedBy, after: { date: input.date, requested: values.length, inserted: inserted.length, timeEntryIds: inserted.map((entry) => entry.id) }, reason: "Geração controlada para desenvolvimento" });
+    if (inserted.length) await recordAudit(tx, { action: "IMPORT_SIMULATED_TIME_ENTRIES", entity: "Employee", entityId: input.employeeId, performedBy, after: { date: input.date, requested: values.length, inserted: inserted.length, timeEntryIds: inserted.map((entry) => entry.id) }, reason: "Geração controlada para desenvolvimento" });
     return { requested: values.length, inserted: inserted.length, ignored: values.length - inserted.length };
   });
 }

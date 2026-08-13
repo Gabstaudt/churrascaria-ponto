@@ -17,6 +17,7 @@ export const leaveTypeValues = ["MEDICAL", "PERSONAL", "LEGAL", "OTHER"] as cons
 export const timeEntrySourceValues = ["SIMULATOR", "IMPORT", "REP_C"] as const;
 export const timeAdjustmentTypeValues = ["ADD_ENTRY", "IGNORE_ENTRY", "FORGOTTEN_EXIT", "JUSTIFY_LATE", "JUSTIFY_EARLY_EXIT"] as const;
 export const absenceDecisionValues = ["UNJUSTIFIED", "JUSTIFIED", "MEDICAL_CERTIFICATE", "DAY_OFF", "VACATION", "LEAVE", "TIME_ENTRY_ERROR", "OTHER"] as const;
+export const timeBankEntryTypeValues = ["DAILY_CALCULATION", "RECALCULATION", "MANUAL_ADJUSTMENT"] as const;
 
 export type EmployeeStatus = (typeof employeeStatusValues)[number];
 
@@ -31,3 +32,4 @@ export const leaveTypeEnum = pgEnum("leave_type", leaveTypeValues);
 export const timeEntrySourceEnum = pgEnum("time_entry_source", timeEntrySourceValues);
 export const timeAdjustmentTypeEnum = pgEnum("time_adjustment_type", timeAdjustmentTypeValues);
 export const absenceDecisionEnum = pgEnum("absence_decision", absenceDecisionValues);
+export const timeBankEntryTypeEnum = pgEnum("time_bank_entry_type", timeBankEntryTypeValues);

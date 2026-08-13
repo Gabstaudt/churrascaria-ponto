@@ -201,6 +201,56 @@ a { color: inherit; text-decoration: none; }
   .form-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Sprint 15: banco de horas; componentes isolados do layout administrativo. */
+.time-bank-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.time-bank-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .85rem; margin-top: 1rem; }
+.time-bank-summary article { display: flex; gap: .75rem; align-items: center; padding: 1rem; border: 1px solid var(--line); border-radius: .85rem; background: var(--surface); color: var(--brand); }
+.time-bank-summary article.negative { color: #a23a32; }
+.time-bank-summary span { display: grid; gap: .15rem; }
+.time-bank-summary small { color: var(--muted); font-size: .72rem; }
+.time-bank-summary strong { color: var(--ink); font-size: 1.15rem; }
+.time-bank-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(17rem, .7fr); align-items: start; gap: 1rem; }
+.time-bank-ledger > header, .time-bank-tools section > header, .time-bank-policies > header { display: flex; align-items: center; gap: .65rem; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); color: var(--brand); }
+.time-bank-ledger > header { justify-content: space-between; }
+.time-bank-ledger header h2, .time-bank-tools h2, .time-bank-policies h2, .time-bank-ledger header p, .time-bank-tools header p, .time-bank-policies header p { margin: 0; }
+.time-bank-ledger header p, .time-bank-tools header p, .time-bank-policies header p { margin-top: .2rem; color: var(--muted); font-size: .75rem; }
+.time-bank-filters { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: .65rem; padding: .85rem 1rem; border-bottom: 1px solid var(--line); background: #fafbfa; }
+.time-bank-filters select, .time-bank-filters input, .time-bank-tools select, .time-bank-tools input, .time-bank-tools textarea, .time-bank-policies input { width: 100%; min-width: 0; padding: .65rem .7rem; border: 1px solid var(--line); border-radius: .6rem; background: white; color: var(--ink); font: inherit; }
+.time-bank-filters button, .time-bank-tools button, .time-bank-policies button { display: inline-flex; min-height: 2.65rem; align-items: center; justify-content: center; gap: .4rem; padding: 0 .85rem; border: 0; border-radius: .6rem; background: var(--brand); color: white; font-weight: 800; cursor: pointer; }
+.time-bank-entries article { display: grid; grid-template-columns: auto minmax(145px, 1fr) minmax(180px, 1.2fr) auto minmax(90px, .6fr); gap: .8rem; align-items: center; padding: .9rem 1rem; border-top: 1px solid #edf0ed; }
+.time-bank-entries article > span { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; border-radius: .6rem; }
+.time-bank-entries .credit { background: #e6efe8; color: var(--brand); }
+.time-bank-entries .debit { background: #fff0ef; color: #a23a32; }
+.time-bank-entries article > div { display: grid; min-width: 0; gap: .15rem; }
+.time-bank-entries small { overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; }
+.time-bank-entries em { font-style: normal; font-weight: 850; white-space: nowrap; }
+.time-bank-entries em.positive { color: var(--brand); }
+.time-bank-entries em.negative { color: #a23a32; }
+.time-bank-tools { display: grid; gap: 1rem; }
+.time-bank-tools .data-panel { margin-top: 1rem; }
+.time-bank-tools form { display: grid; gap: .7rem; padding: 1rem; }
+.time-bank-tools label, .time-bank-policies label { display: grid; gap: .35rem; color: var(--muted); font-size: .72rem; font-weight: 700; }
+.time-bank-policies > div { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 1rem; padding: 1rem; }
+.time-bank-policies form { display: grid; grid-template-columns: 1.3fr repeat(3, 1fr) auto; gap: .65rem; align-items: end; }
+.policy-list { display: grid; gap: .5rem; align-content: start; }
+.policy-list article { display: grid; gap: .2rem; padding: .7rem .8rem; border: 1px solid var(--line); border-radius: .65rem; background: #fafbfa; }
+.policy-list small, .policy-list span, .policy-list p { color: var(--muted); font-size: .7rem; }
+
+@media (max-width: 1000px) {
+  .time-bank-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .time-bank-layout { grid-template-columns: 1fr; }
+  .time-bank-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .time-bank-policies > div, .time-bank-policies form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .time-bank-policies form > button { grid-column: 1 / -1; }
+}
+
+@media (max-width: 700px) {
+  .time-bank-summary, .time-bank-tools, .time-bank-policies > div, .time-bank-policies form { grid-template-columns: 1fr; }
+  .time-bank-filters { grid-template-columns: 1fr; }
+  .time-bank-entries article { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .time-bank-entries article > div:nth-of-type(2), .time-bank-entries article > small { grid-column: 2 / 4; }
+}
+
 /* Sprint 14: apuração diária explicável, sem alterar a grade de tratamentos. */
 .attendance-calculation { margin-top: 1rem; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); box-shadow: 0 4px 20px rgb(24 32 27 / 3%); }
 .attendance-calculation > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--line); background: #f8faf8; }

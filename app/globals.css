@@ -201,6 +201,41 @@ a { color: inherit; text-decoration: none; }
   .form-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Sprint 14: apuração diária explicável, sem alterar a grade de tratamentos. */
+.attendance-calculation { margin-top: 1rem; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); box-shadow: 0 4px 20px rgb(24 32 27 / 3%); }
+.attendance-calculation > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.attendance-calculation > header > div { display: flex; align-items: center; gap: .65rem; color: var(--brand); }
+.attendance-calculation > header span { display: grid; gap: .15rem; }
+.attendance-calculation > header small { color: var(--muted); font-size: .72rem; }
+.calculation-status { flex: none; padding: .4rem .65rem; border-radius: 999px; background: #e6efe8; color: var(--brand); font-size: .72rem; font-style: normal; font-weight: 800; }
+.calculation-status.status-incomplete { background: #fff0dc; color: #8a5b10; }
+.calculation-status.status-no_entries { background: #f0f2f0; color: var(--muted); }
+.attendance-metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.attendance-metrics article { display: flex; min-width: 0; gap: .55rem; padding: 1rem; border-right: 1px solid #edf0ed; color: var(--brand); }
+.attendance-metrics article:last-child { border-right: 0; }
+.attendance-metrics span { display: grid; min-width: 0; gap: .15rem; }
+.attendance-metrics small { color: var(--muted); font-size: .68rem; }
+.attendance-metrics strong { color: var(--ink); font-size: 1rem; white-space: nowrap; }
+.attendance-metrics em { color: var(--brand); font-size: .66rem; font-style: normal; font-weight: 800; }
+.attendance-calculation details { border-top: 1px solid var(--line); }
+.attendance-calculation summary { padding: .85rem 1.2rem; color: var(--brand); font-size: .8rem; font-weight: 800; cursor: pointer; }
+.attendance-calculation details > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; padding: 0 1.2rem 1.2rem; }
+.attendance-calculation details article { min-width: 0; padding: .8rem; border: 1px solid var(--line); border-radius: .7rem; background: #fafbfa; }
+.attendance-calculation details p { margin: .3rem 0; color: var(--muted); font-size: .74rem; line-height: 1.45; }
+.attendance-calculation details small { color: var(--brand); font-size: .65rem; overflow-wrap: anywhere; }
+
+@media (max-width: 1000px) {
+  .attendance-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .attendance-metrics article { border-bottom: 1px solid #edf0ed; }
+  .attendance-calculation details > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .attendance-calculation > header { align-items: flex-start; flex-direction: column; }
+  .attendance-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .attendance-calculation details > div { grid-template-columns: 1fr; }
+}
+
 /* Sprint 13: atestados; seletores isolados para preservar o layout-base. */
 .certificates-page, .certificate-form-page { width: 100%; max-width: 1180px; margin-inline: auto; }
 .certificate-security { display: flex; align-items: center; gap: .75rem; margin-top: 1rem; padding: .9rem 1rem; border: 1px solid #b9d4c3; border-radius: .8rem; background: #edf5ef; color: var(--brand); }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, isNull, lte, ne, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { auditLogs, employees, scheduleDays, workSchedules } from "@/db/schema";
 import type { WorkScheduleCreateInput } from "@/validations/work-schedule";
@@ -30,6 +30,32 @@ export async function createWorkSchedule(input: WorkScheduleCreateInput, perform
     })));
     await tx.insert(auditLogs).values({ action: "CREATE_WORK_SCHEDULE", entity: "WorkSchedule", entityId: schedule.id, performedBy, after: { employeeId: schedule.employeeId, name: schedule.name, validFrom: schedule.validFrom, validTo: schedule.validTo, days: input.days } });
     return schedule;
+  });
+}
+
+export async function updateWorkSchedule(id: string, input: WorkScheduleCreateInput, performedBy: string) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.employeeId}))`);
+    const [current] = await tx.select().from(workSchedules).where(eq(workSchedules.id, id)).limit(1);
+    if (!current) return undefined;
+    const currentDays = await tx.select().from(scheduleDays).where(eq(scheduleDays.workScheduleId, id));
+    const overlap = await tx.select({ id: workSchedules.id }).from(workSchedules).where(and(
+      ne(workSchedules.id, id),
+      eq(workSchedules.employeeId, input.employeeId),
+      or(isNull(workSchedules.validTo), gte(workSchedules.validTo, input.validFrom)),
+      input.validTo ? lte(workSchedules.validFrom, input.validTo) : sql`true`,
+    )).limit(1);
+    if (overlap.length) throw new ScheduleOverlapError();
+    const [updated] = await tx.update(workSchedules).set({ employeeId: input.employeeId, name: input.name, validFrom: input.validFrom, validTo: input.validTo ?? null }).where(eq(workSchedules.id, id)).returning();
+    await tx.delete(scheduleDays).where(eq(scheduleDays.workScheduleId, id));
+    await tx.insert(scheduleDays).values(input.days.map((day) => ({
+      workScheduleId: id, dayOfWeek: day.dayOfWeek, isWorkDay: day.isWorkDay,
+      startTime: day.isWorkDay ? day.startTime : null, endTime: day.isWorkDay ? day.endTime : null,
+      breakStartTime: day.isWorkDay ? day.breakStartTime : null, breakEndTime: day.isWorkDay ? day.breakEndTime : null,
+      toleranceMinutes: day.isWorkDay ? day.toleranceMinutes : 0,
+    })));
+    await tx.insert(auditLogs).values({ action: "UPDATE_WORK_SCHEDULE", entity: "WorkSchedule", entityId: id, performedBy, before: { ...current, days: currentDays }, after: { ...updated, days: input.days } });
+    return updated;
   });
 }
 

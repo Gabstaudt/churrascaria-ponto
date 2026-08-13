@@ -430,6 +430,57 @@ a { color: inherit; text-decoration: none; }
   .schedule-form .schedule-time-grid label:last-child { grid-column: auto; }
 }
 
+/* Sprint 8: immutable time entries, scoped to their screens. */
+.time-entries-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.time-entries-panel { border-radius: 1rem; }
+.time-entry-filters { display: grid; grid-template-columns: auto repeat(3, minmax(10rem, 1fr)) auto; align-items: center; gap: .65rem; padding: 1rem; border-bottom: 1px solid var(--line); }
+.time-entry-filters > span { display: flex; align-items: center; gap: .4rem; color: var(--muted); font-size: .78rem; font-weight: 800; }
+.time-entry-filters select, .time-entry-filters input { min-width: 0; min-height: 2.65rem; padding: 0 .7rem; border: 1px solid var(--line); border-radius: .6rem; background: #fafbfa; color: var(--ink); }
+.time-entry-filters button { min-height: 2.65rem; padding: 0 .9rem; border: 0; border-radius: .6rem; background: var(--brand); color: white; font-weight: 800; cursor: pointer; }
+.time-entry-list { display: grid; }
+.time-entry-list article { display: grid; grid-template-columns: 2.4rem minmax(11rem, 1.1fr) minmax(10rem, .85fr) auto minmax(14rem, 1.2fr); align-items: center; gap: .8rem; min-height: 4.8rem; padding: .8rem 1.1rem; border-bottom: 1px solid #edf0ed; }
+.time-entry-list article:last-child { border-bottom: 0; }
+.time-entry-icon { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border-radius: .65rem; background: #e7f0e9; color: var(--brand); }
+.time-entry-person, .time-entry-moment, .time-entry-origin { display: grid; min-width: 0; gap: .2rem; }
+.time-entry-list small { color: var(--muted); font-size: .7rem; }
+.time-entry-person strong, .time-entry-origin strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.time-entry-source { justify-self: start; padding: .3rem .55rem; border-radius: 999px; font-size: .67rem; font-weight: 850; }
+.source-simulator { background: #e8f1fb; color: #285c8e; }
+.source-import { background: #fff2d9; color: #805911; }
+.source-rep_c { background: #e5f2e9; color: #286443; }
+.time-entry-meta { padding: 1.25rem; }
+.time-entry-times { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; padding: 1.25rem; }
+.time-entry-times .field-group > div { display: grid; grid-template-columns: minmax(0, 1fr) 2.7rem; gap: .4rem; }
+.time-entry-times input { width: 100%; min-width: 0; }
+.time-entry-times .field-group button { display: grid; min-height: 3rem; place-items: center; border: 1px solid var(--line); border-radius: .6rem; background: #fff7f6; color: #9f312a; cursor: pointer; }
+.time-entry-times .field-group button:disabled { cursor: not-allowed; opacity: .4; }
+.time-entry-add { align-self: end; min-height: 3rem; border: 1px dashed #aebbb2; border-radius: .6rem; background: #f8faf8; color: var(--brand); font-weight: 800; cursor: pointer; }
+.employee-time-entries { display: grid; }
+.employee-time-entries > div { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .8rem 1rem; border-bottom: 1px solid #edf0ed; }
+.employee-time-entries > div:last-child { border-bottom: 0; }
+.employee-time-entries > div > span { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: .6rem; background: #e7f0e9; color: var(--brand); }
+.employee-time-entries small { color: var(--muted); font-size: .72rem; }
+
+@media (max-width: 1000px) {
+  .time-entry-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .time-entry-filters > span { grid-column: span 2; }
+  .time-entry-list article { grid-template-columns: 2.4rem minmax(0, 1fr) auto; }
+  .time-entry-moment, .time-entry-origin { grid-column: 2; }
+  .time-entry-source { grid-column: 3; grid-row: 1; }
+}
+
+@media (max-width: 760px) {
+  .time-entry-times { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 1rem; }
+}
+
+@media (max-width: 560px) {
+  .time-entry-filters, .time-entry-times { grid-template-columns: 1fr; }
+  .time-entry-filters > span { grid-column: auto; }
+  .time-entry-list article { grid-template-columns: 2.4rem minmax(0, 1fr); }
+  .time-entry-source { grid-column: 2; grid-row: auto; }
+  .time-entry-origin { display: none; }
+}
+
 /* Sprint 6: operational calendar and date exceptions */
 .calendar-page { width: 100%; max-width: 1180px; margin-inline: auto; }
 .calendar-page .page-heading-actions { display: flex; align-items: center; gap: .6rem; }

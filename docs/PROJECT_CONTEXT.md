@@ -191,9 +191,9 @@ para recursos sofisticados antes de estabilizar essa fundação.
 
 ## Estado de execução
 
-As Sprints 1 a 7 foram implementadas e validadas com PostgreSQL local. O primeiro
+As Sprints 1 a 8 foram implementadas e validadas com PostgreSQL local. O primeiro
 marco funcional — autenticação e ciclo administrativo completo de funcionários —
 está concluído, e jornadas históricas já podem ser configuradas. Os detalhes
 estão registrados nos relatórios em `docs/sprints/`.
 
-O próximo trabalho planejado é a Sprint 8: marcações originais simuladas.
+O próximo trabalho planejado é a Sprint 9: situação diária e dashboard operacional.

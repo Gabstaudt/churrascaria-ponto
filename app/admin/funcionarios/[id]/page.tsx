@@ -6,6 +6,7 @@ import { EmployeeActiveForm } from "@/components/employees/employee-active-form"
 import { EmployeeStatusBadge } from "@/components/employees/employee-status-badge";
 import { getEmployeeAvailability } from "@/services/availability.service";
 import { getEmployeeById, listEmployeeDocuments } from "@/services/employee.service";
+import { listEmployeeTimeEntries } from "@/services/time-entry.service";
 import { listWorkSchedulesByEmployee } from "@/services/work-schedule.service";
 import { formatCpf, formatDate, formatPhone } from "@/utils/format";
 import { employeeIdSchema } from "@/validations/employee";
@@ -26,7 +27,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: PageP
   const { id } = await params;
   const parsedId = employeeIdSchema.safeParse(id);
   if (!parsedId.success) notFound();
-  const [employee, schedules, availability, documents] = await Promise.all([getEmployeeById(id), listWorkSchedulesByEmployee(id), getEmployeeAvailability(id), listEmployeeDocuments(id)]);
+  const [employee, schedules, availability, documents, timeEntries] = await Promise.all([getEmployeeById(id), listWorkSchedulesByEmployee(id), getEmployeeAvailability(id), listEmployeeDocuments(id), listEmployeeTimeEntries(id)]);
   if (!employee) notFound();
   const query = await searchParams;
   const tab: Tab = tabs.some((item) => item.id === query.tab) ? query.tab as Tab : "overview";
@@ -48,7 +49,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: PageP
 
     {tab === "documents" ? <section className="employee-tab-panel"><header><div><h2>Documentos</h2><p>Arquivos e comprovantes vinculados ao funcionário.</p></div></header>{documents.length ? <div className="employee-related-list">{documents.map((document) => <div className="employee-document-row" key={document.id}><span><FileText size={18} /></span><div><strong>{document.title}</strong><small>{document.type} · {document.fileName}</small></div><em>{formatDate(document.createdAt.toISOString().slice(0, 10))}</em></div>)}</div> : <Empty icon={<FileText size={26} />} title="Nenhum documento anexado" text="A estrutura de documentos já está pronta. O envio e a visualização serão habilitados com o armazenamento seguro." />}</section> : null}
 
-    {tab === "timesheet" ? <section className="employee-tab-panel"><header><div><h2>Espelho de ponto</h2><p>Marcações, ocorrências e totais mensais do funcionário.</p></div></header><Empty icon={<Clock3 size={26} />} title="Espelho de ponto ainda não disponível" text="Este espaço receberá as marcações imutáveis e os cálculos das próximas sprints. Nenhum dado fictício será apresentado." /></section> : null}
+    {tab === "timesheet" ? <section className="employee-tab-panel"><header><div><h2>Marcações de ponto</h2><p>Registros originais mais recentes deste funcionário.</p></div><div><Link className="secondary-button detail-action" href={`/admin/marcacoes?employeeId=${id}`}><Clock3 size={16} /> Ver todas</Link><Link className="primary-button action-button" href={`/admin/marcacoes/simular?employeeId=${id}`}><Plus size={16} /> Simular</Link></div></header>{timeEntries.length ? <div className="employee-time-entries">{timeEntries.map((entry) => <div key={entry.id}><span><Clock3 size={17} /></span><strong>{new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Belem" }).format(entry.occurredAt)}</strong><small>{entry.source === "SIMULATOR" ? "Simulador" : entry.source === "IMPORT" ? "Importação" : "REP-C"}</small></div>)}</div> : <Empty icon={<Clock3 size={26} />} title="Nenhuma marcação registrada" text="As marcações originais deste funcionário aparecerão aqui. Use o simulador apenas no ambiente de desenvolvimento." action={<Link className="primary-button action-button" href={`/admin/marcacoes/simular?employeeId=${id}`}>Simular marcações</Link>} />}</section> : null}
   </main>;
 }
 

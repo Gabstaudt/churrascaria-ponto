@@ -2,8 +2,9 @@ import "server-only";
 
 import { and, asc, desc, eq, gte, isNull, lte, ne, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLogs, employees, scheduleDays, workSchedules } from "@/db/schema";
+import { employees, scheduleDays, workSchedules } from "@/db/schema";
 import type { WorkScheduleCreateInput } from "@/validations/work-schedule";
+import { recordAudit } from "./audit.service";
 
 export class ScheduleOverlapError extends Error {
   constructor() { super("Já existe uma jornada vigente nesse período para o funcionário."); this.name = "ScheduleOverlapError"; }
@@ -28,7 +29,7 @@ export async function createWorkSchedule(input: WorkScheduleCreateInput, perform
       breakStartTime: day.isWorkDay ? day.breakStartTime : null, breakEndTime: day.isWorkDay ? day.breakEndTime : null,
       toleranceMinutes: day.isWorkDay ? day.toleranceMinutes : 0,
     })));
-    await tx.insert(auditLogs).values({ action: "CREATE_WORK_SCHEDULE", entity: "WorkSchedule", entityId: schedule.id, performedBy, after: { employeeId: schedule.employeeId, name: schedule.name, validFrom: schedule.validFrom, validTo: schedule.validTo, days: input.days } });
+    await recordAudit(tx, { action: "CREATE_WORK_SCHEDULE", entity: "WorkSchedule", entityId: schedule.id, performedBy, after: { employeeId: schedule.employeeId, name: schedule.name, validFrom: schedule.validFrom, validTo: schedule.validTo, days: input.days } });
     return schedule;
   });
 }
@@ -54,7 +55,7 @@ export async function updateWorkSchedule(id: string, input: WorkScheduleCreateIn
       breakStartTime: day.isWorkDay ? day.breakStartTime : null, breakEndTime: day.isWorkDay ? day.breakEndTime : null,
       toleranceMinutes: day.isWorkDay ? day.toleranceMinutes : 0,
     })));
-    await tx.insert(auditLogs).values({ action: "UPDATE_WORK_SCHEDULE", entity: "WorkSchedule", entityId: id, performedBy, before: { ...current, days: currentDays }, after: { ...updated, days: input.days } });
+    await recordAudit(tx, { action: "UPDATE_WORK_SCHEDULE", entity: "WorkSchedule", entityId: id, performedBy, before: { ...current, days: currentDays }, after: { ...updated, days: input.days } });
     return updated;
   });
 }

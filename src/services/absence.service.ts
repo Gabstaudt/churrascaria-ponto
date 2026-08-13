@@ -2,8 +2,9 @@ import "server-only";
 
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/db";
-import { absenceJustifications, absences, auditLogs, employees, users } from "@/db/schema";
+import { absenceJustifications, absences, employees, users } from "@/db/schema";
 import type { AbsenceDecisionInput } from "@/validations/absence";
+import { recordAudit } from "./audit.service";
 
 export async function decideAbsence(input: AbsenceDecisionInput, performedBy: string) {
   return db.transaction(async (tx) => {
@@ -13,7 +14,7 @@ export async function decideAbsence(input: AbsenceDecisionInput, performedBy: st
       : await tx.insert(absences).values({ employeeId: input.employeeId, date: input.date, decision: input.decision, decidedBy: performedBy }).returning();
     if (!absence) throw new Error("Não foi possível registrar a decisão.");
     const [justification] = await tx.insert(absenceJustifications).values({ absenceId: absence.id, decision: input.decision, reason: input.reason, approvedBy: performedBy }).returning();
-    await tx.insert(auditLogs).values({ action: current ? "UPDATE_ABSENCE_DECISION" : "DECIDE_ABSENCE", entity: "Absence", entityId: absence.id, performedBy, before: current ?? null, after: { absence, justification }, reason: input.reason });
+    await recordAudit(tx, { action: current ? "UPDATE_ABSENCE_DECISION" : "DECIDE_ABSENCE", entity: "Absence", entityId: absence.id, performedBy, before: current ?? null, after: { absence, justification }, reason: input.reason });
     return absence;
   });
 }

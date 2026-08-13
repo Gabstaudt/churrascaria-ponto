@@ -2,8 +2,9 @@ import "server-only";
 
 import { and, desc, eq, gte, lte, or } from "drizzle-orm";
 import { db } from "@/db";
-import { auditLogs, dayOffSwaps, daysOff, employees, leavePeriods, vacations } from "@/db/schema";
+import { dayOffSwaps, daysOff, employees, leavePeriods, vacations } from "@/db/schema";
 import type { AvailabilityCreateInput } from "@/validations/availability";
+import { recordAudit } from "./audit.service";
 
 export class AvailabilityConflictError extends Error {
   constructor(message = "Já existe férias ou afastamento nesse período para o funcionário.") { super(message); this.name = "AvailabilityConflictError"; }
@@ -23,22 +24,22 @@ export async function createAvailability(input: AvailabilityCreateInput, perform
       const [existing] = await tx.select().from(daysOff).where(and(eq(daysOff.employeeId, input.employeeId), eq(daysOff.date, input.date!))).limit(1);
       if (!existing && await hasPeriodConflict(tx, input.employeeId, input.date!, input.date!)) throw new AvailabilityConflictError("A folga conflita com outro período ou troca aprovada.");
       const [saved] = existing ? await tx.update(daysOff).set({ reason: input.reason, authorizedBy: performedBy }).where(eq(daysOff.id, existing.id)).returning() : await tx.insert(daysOff).values({ employeeId: input.employeeId, date: input.date!, reason: input.reason, authorizedBy: performedBy }).returning();
-      await tx.insert(auditLogs).values({ action: existing ? "UPDATE_DAY_OFF" : "CREATE_DAY_OFF", entity: "DayOff", entityId: saved!.id, performedBy, before: existing ?? null, after: saved!, reason: input.reason });
+      await recordAudit(tx, { action: existing ? "UPDATE_DAY_OFF" : "CREATE_DAY_OFF", entity: "DayOff", entityId: saved!.id, performedBy, before: existing ?? null, after: saved!, reason: input.reason });
       return saved;
     }
     if (input.kind === "SWAP") {
       const [saved] = await tx.insert(dayOffSwaps).values({ employeeId: input.employeeId, dayOffDate: input.date!, workDate: input.workDate!, reason: input.reason, requestedBy: performedBy }).returning();
-      await tx.insert(auditLogs).values({ action: "REQUEST_DAY_OFF_SWAP", entity: "DayOffSwap", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
+      await recordAudit(tx, { action: "REQUEST_DAY_OFF_SWAP", entity: "DayOffSwap", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
       return saved;
     }
     if (await hasPeriodConflict(tx, input.employeeId, input.startDate!, input.endDate!)) throw new AvailabilityConflictError();
     if (input.kind === "VACATION") {
       const [saved] = await tx.insert(vacations).values({ employeeId: input.employeeId, startDate: input.startDate!, endDate: input.endDate!, reason: input.reason, authorizedBy: performedBy }).returning();
-      await tx.insert(auditLogs).values({ action: "CREATE_VACATION", entity: "Vacation", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
+      await recordAudit(tx, { action: "CREATE_VACATION", entity: "Vacation", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
       return saved;
     }
     const [saved] = await tx.insert(leavePeriods).values({ employeeId: input.employeeId, type: input.leaveType!, startDate: input.startDate!, endDate: input.endDate!, reason: input.reason, authorizedBy: performedBy }).returning();
-    await tx.insert(auditLogs).values({ action: "CREATE_LEAVE_PERIOD", entity: "LeavePeriod", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
+    await recordAudit(tx, { action: "CREATE_LEAVE_PERIOD", entity: "LeavePeriod", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
     return saved;
   });
 }
@@ -49,7 +50,7 @@ export async function reviewDayOffSwap(id: string, decision: "APPROVED" | "REJEC
     if (!current || current.status !== "PENDING") return undefined;
     if (decision === "APPROVED" && (await hasPeriodConflict(tx, current.employeeId, current.dayOffDate, current.workDate))) throw new AvailabilityConflictError("A troca conflita com férias ou afastamento do funcionário.");
     const [saved] = await tx.update(dayOffSwaps).set({ status: decision, reviewedBy: performedBy, reviewedAt: new Date(), reviewReason: reason }).where(eq(dayOffSwaps.id, id)).returning();
-    await tx.insert(auditLogs).values({ action: decision === "APPROVED" ? "APPROVE_DAY_OFF_SWAP" : "REJECT_DAY_OFF_SWAP", entity: "DayOffSwap", entityId: id, performedBy, before: current, after: saved!, reason });
+    await recordAudit(tx, { action: decision === "APPROVED" ? "APPROVE_DAY_OFF_SWAP" : "REJECT_DAY_OFF_SWAP", entity: "DayOffSwap", entityId: id, performedBy, before: current, after: saved!, reason });
     return saved;
   });
 }

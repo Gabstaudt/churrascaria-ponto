@@ -8,6 +8,8 @@ import type { EmployeeCreateInput, EmployeeUpdateInput } from "@/validations/emp
 
 import { mapEmployeeConflict } from "./employee-errors";
 import { isEmployeeActiveForStatus, resolveEmployeeActivation } from "./employee-status";
+import { recordAudit } from "./audit.service";
+import { redactAuditPayload } from "./audit-redaction";
 
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
@@ -46,7 +48,7 @@ export async function createEmployee(input: EmployeeCreateInput, performedBy: st
 
       if (!employee) throw new Error("Não foi possível cadastrar o funcionário.");
 
-      await tx.insert(auditLogs).values({
+      await recordAudit(tx, {
         action: "CREATE_EMPLOYEE",
         entity: "Employee",
         entityId: employee.id,
@@ -81,7 +83,7 @@ export async function listEmployeeDocuments(id: string) {
 }
 
 export async function getEmployeeAuditHistory(id: string) {
-  return db
+  const history = await db
     .select({
       id: auditLogs.id,
       action: auditLogs.action,
@@ -95,6 +97,7 @@ export async function getEmployeeAuditHistory(id: string) {
     .innerJoin(users, eq(users.id, auditLogs.performedBy))
     .where(and(eq(auditLogs.entity, "Employee"), eq(auditLogs.entityId, id)))
     .orderBy(desc(auditLogs.createdAt));
+  return history.map((item) => ({ ...item, before: redactAuditPayload(item.before), after: redactAuditPayload(item.after) }));
 }
 
 function auditSnapshot(employee: typeof employees.$inferSelect) {
@@ -129,7 +132,7 @@ export async function updateEmployee(id: string, input: EmployeeUpdateInput, per
         .returning();
       if (!updated) throw new Error("Não foi possível atualizar o funcionário.");
 
-      await tx.insert(auditLogs).values({
+      await recordAudit(tx, {
         action: "UPDATE_EMPLOYEE",
         entity: "Employee",
         entityId: id,
@@ -157,7 +160,7 @@ export async function setEmployeeActive(id: string, active: boolean, performedBy
       .where(eq(employees.id, id))
       .returning();
     if (!updated) throw new Error("Não foi possível alterar o funcionário.");
-    await tx.insert(auditLogs).values({
+    await recordAudit(tx, {
       action: active ? "REACTIVATE_EMPLOYEE" : "DEACTIVATE_EMPLOYEE",
       entity: "Employee",
       entityId: id,

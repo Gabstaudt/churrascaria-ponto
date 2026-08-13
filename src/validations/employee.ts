@@ -62,6 +62,20 @@ export const employeeCreateSchema = z.object({
 
 export type EmployeeCreateInput = z.infer<typeof employeeCreateSchema>;
 
+export const employeeUpdateSchema = employeeCreateSchema.pick({
+  fullName: true,
+  cpf: true,
+  phone: true,
+  position: true,
+  registrationNumber: true,
+  admissionDate: true,
+  status: true,
+});
+
+export type EmployeeUpdateInput = z.infer<typeof employeeUpdateSchema>;
+
+export const employeeIdSchema = z.uuid("Funcionário inválido.");
+
 export const employeeListQuerySchema = z.object({
   query: z.string().trim().max(100).catch(""),
   status: z.enum(employeeStatusValues).optional().catch(undefined),

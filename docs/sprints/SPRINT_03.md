@@ -54,3 +54,12 @@ tabela vazia no schema `drizzle` é inofensiva e não é usada pelo projeto.
 
 Validar manualmente o cadastro e a busca no navegador e iniciar a Sprint 4:
 detalhe, edição, status, inativação e reativação de funcionários.
+
+## Extensão solicitada após a entrega
+
+A listagem e o cadastro receberam um redesenho mobile-first. Também foi antecipada
+parte do escopo da Sprint 4 por solicitação direta: cada funcionário agora abre
+uma página de detalhes, pode ser editado, inativado e reativado. “Excluir” foi
+implementado como inativação, preservando histórico e auditoria conforme as
+regras centrais do projeto. A Sprint 4 continuará responsável pela consolidação
+e validação ampliada desses fluxos.

@@ -4,7 +4,7 @@ import { and, asc, count, eq, ilike, or, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
 import { auditLogs, employees, type EmployeeStatus } from "@/db/schema";
-import type { EmployeeCreateInput } from "@/validations/employee";
+import type { EmployeeCreateInput, EmployeeUpdateInput } from "@/validations/employee";
 
 import { mapEmployeeConflict } from "./employee-errors";
 
@@ -67,6 +67,79 @@ export async function createEmployee(input: EmployeeCreateInput, performedBy: st
     if (conflict) throw conflict;
     throw error;
   }
+}
+
+export async function getEmployeeById(id: string) {
+  const [employee] = await db.select().from(employees).where(eq(employees.id, id)).limit(1);
+  return employee;
+}
+
+function auditSnapshot(employee: typeof employees.$inferSelect) {
+  return {
+    id: employee.id,
+    fullName: employee.fullName,
+    cpf: employee.cpf,
+    phone: employee.phone,
+    position: employee.position,
+    registrationNumber: employee.registrationNumber,
+    admissionDate: employee.admissionDate,
+    status: employee.status,
+    isActive: employee.isActive,
+  };
+}
+
+export async function updateEmployee(id: string, input: EmployeeUpdateInput, performedBy: string) {
+  try {
+    return await db.transaction(async (tx) => {
+      const [current] = await tx.select().from(employees).where(eq(employees.id, id)).limit(1);
+      if (!current) return undefined;
+
+      const isActive = input.status !== "INACTIVE" && input.status !== "TERMINATED";
+      const [updated] = await tx
+        .update(employees)
+        .set({ ...input, isActive, updatedAt: new Date() })
+        .where(eq(employees.id, id))
+        .returning();
+      if (!updated) throw new Error("Não foi possível atualizar o funcionário.");
+
+      await tx.insert(auditLogs).values({
+        action: "UPDATE_EMPLOYEE",
+        entity: "Employee",
+        entityId: id,
+        performedBy,
+        before: auditSnapshot(current),
+        after: auditSnapshot(updated),
+      });
+      return updated;
+    });
+  } catch (error) {
+    const conflict = mapEmployeeConflict(error);
+    if (conflict) throw conflict;
+    throw error;
+  }
+}
+
+export async function setEmployeeActive(id: string, active: boolean, performedBy: string) {
+  return db.transaction(async (tx) => {
+    const [current] = await tx.select().from(employees).where(eq(employees.id, id)).limit(1);
+    if (!current) return undefined;
+    const [updated] = await tx
+      .update(employees)
+      .set({ isActive: active, status: active ? "ACTIVE" : "INACTIVE", updatedAt: new Date() })
+      .where(eq(employees.id, id))
+      .returning();
+    if (!updated) throw new Error("Não foi possível alterar o funcionário.");
+    await tx.insert(auditLogs).values({
+      action: active ? "REACTIVATE_EMPLOYEE" : "DEACTIVATE_EMPLOYEE",
+      entity: "Employee",
+      entityId: id,
+      performedBy,
+      before: auditSnapshot(current),
+      after: auditSnapshot(updated),
+      reason: active ? "Reativação administrativa" : "Inativação administrativa",
+    });
+    return updated;
+  });
 }
 
 export async function listEmployees(input: EmployeeListInput = {}): Promise<EmployeeListResult> {

@@ -15,6 +15,7 @@ export type ScheduleExceptionType = (typeof scheduleExceptionTypeValues)[number]
 export const dayOffSwapStatusValues = ["PENDING", "APPROVED", "REJECTED"] as const;
 export const leaveTypeValues = ["MEDICAL", "PERSONAL", "LEGAL", "OTHER"] as const;
 export const timeEntrySourceValues = ["SIMULATOR", "IMPORT", "REP_C"] as const;
+export const timeAdjustmentTypeValues = ["ADD_ENTRY", "IGNORE_ENTRY", "FORGOTTEN_EXIT", "JUSTIFY_LATE", "JUSTIFY_EARLY_EXIT"] as const;
 
 export type EmployeeStatus = (typeof employeeStatusValues)[number];
 
@@ -27,3 +28,4 @@ export const scheduleExceptionTypeEnum = pgEnum("schedule_exception_type", sched
 export const dayOffSwapStatusEnum = pgEnum("day_off_swap_status", dayOffSwapStatusValues);
 export const leaveTypeEnum = pgEnum("leave_type", leaveTypeValues);
 export const timeEntrySourceEnum = pgEnum("time_entry_source", timeEntrySourceValues);
+export const timeAdjustmentTypeEnum = pgEnum("time_adjustment_type", timeAdjustmentTypeValues);

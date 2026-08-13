@@ -57,6 +57,13 @@
       "when": 1786637486429,
       "tag": "0007_wealthy_tomas",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786641000966,
+      "tag": "0008_perpetual_blue_blade",
+      "breakpoints": true
     }
   ]
 }

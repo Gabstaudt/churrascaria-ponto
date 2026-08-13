@@ -9,3 +9,4 @@ export * from "./work-schedules";
 export * from "./schedule-exceptions";
 export * from "./availability";
 export * from "./time-entries";
+export * from "./time-adjustments";

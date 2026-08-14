@@ -1,0 +1,2 @@
+export function rateLimitDecision(count: number, limit: number, windowStartedAt: Date, windowSeconds: number, now = new Date()) { const resetAt = new Date(windowStartedAt.getTime() + windowSeconds * 1000); return { allowed: count <= limit, remaining: Math.max(0, limit - count), resetAt, retryAfterSeconds: Math.max(1, Math.ceil((resetAt.getTime() - now.getTime()) / 1000)) }; }
+export function clientAddress(headers: Headers) { const forwarded = headers.get("x-forwarded-for")?.split(",")[0]?.trim(); return forwarded || headers.get("x-real-ip") || "unknown"; }

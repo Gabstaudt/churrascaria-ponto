@@ -1,0 +1,2 @@
+"use client";
+export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) { return <html lang="pt-BR"><body><main className="fatal-error"><p>Gestão de ponto</p><h1>Não foi possível carregar esta tela</h1><span>A ocorrência foi registrada. Tente novamente e, se persistir, contate o suporte.</span><button onClick={reset} type="button">Tentar novamente</button></main></body></html>; }

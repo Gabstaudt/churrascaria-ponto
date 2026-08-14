@@ -1,0 +1,50 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: churrascaria_ponto_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d churrascaria_ponto_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/churrascaria_ponto_test
+      BETTER_AUTH_SECRET: ci-secret-with-at-least-32-characters-long
+      BETTER_AUTH_URL: https://ci.example.invalid
+      APP_ENV: staging
+      R2_ACCOUNT_ID: ci-account
+      R2_ACCESS_KEY_ID: ci-key
+      R2_SECRET_ACCESS_KEY: ci-secret
+      R2_BUCKET_NAME: ci-private-bucket
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --global npm@11.18.0
+      - run: npm ci
+      - run: npm run db:migrate:prod
+      - run: npm run db:generate
+      - name: Verificar migrations versionadas
+        run: git diff --exit-code -- src/db/migrations src/db/schema
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

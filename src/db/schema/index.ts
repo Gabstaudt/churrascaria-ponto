@@ -15,3 +15,4 @@ export * from "./medical-certificates";
 export * from "./time-bank";
 export * from "./closing-periods";
 export * from "./portal";
+export * from "./rate-limits";

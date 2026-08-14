@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { MockREPAdapter } from "./mock-adapter";
+describe("mock REP adapter", () => { const adapter = new MockREPAdapter(); it("aceita somente o contrato mock versionado", () => expect(adapter.parse({ version: "mock-v1", records: [{ nsr: "1", employeeRegistration: "M1", occurredAt: "2026-08-14T08:00:00-03:00", eventType: "CLOCK" }] }).records).toHaveLength(1)); it("rejeita timestamp sem offset e campos extras", () => { expect(() => adapter.parse({ version: "mock-v1", records: [{ nsr: "1", employeeRegistration: "M1", occurredAt: "2026-08-14T08:00:00", eventType: "CLOCK" }] })).toThrow(); expect(() => adapter.parse({ version: "mock-v1", records: [], extra: true })).toThrow(); }); });

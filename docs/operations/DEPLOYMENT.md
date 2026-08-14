@@ -25,6 +25,7 @@ R2_ACCOUNT_ID
 R2_ACCESS_KEY_ID
 R2_SECRET_ACCESS_KEY
 R2_BUCKET_NAME
+REP_CREDENTIAL_PEPPER
 ```
 
 Use `APP_ENV=staging` na homologação e `APP_ENV=production` em produção. A URL do

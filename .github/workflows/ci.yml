@@ -31,6 +31,7 @@ jobs:
       R2_ACCESS_KEY_ID: ci-key
       R2_SECRET_ACCESS_KEY: ci-secret
       R2_BUCKET_NAME: ci-private-bucket
+      REP_CREDENTIAL_PEPPER: ci-rep-pepper-with-at-least-32-characters-long
       NEXT_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v4

@@ -176,6 +176,13 @@
       "when": 1786754877361,
       "tag": "0024_cultured_moondragon",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1786755936765,
+      "tag": "0025_unknown_mandarin",
+      "breakpoints": true
     }
   ]
 }

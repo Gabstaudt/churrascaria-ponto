@@ -1,0 +1,1 @@
+ALTER TABLE "rep_collectors" ADD COLUMN "activated_at" timestamp with time zone;

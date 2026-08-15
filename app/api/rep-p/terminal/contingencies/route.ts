@@ -1,0 +1,9 @@
+import { and, eq } from "drizzle-orm";
+import { z } from "zod";
+import { db } from "@/db";
+import { contingencyRequests, employees } from "@/db/schema";
+import { recordRepPEvent } from "@/rep-p/audit.service";
+import { authenticateTerminal } from "@/services/terminal-auth.service";
+export const runtime = "nodejs";
+const schema = z.object({ registrationNumber: z.string().trim().min(1).max(50), eventType: z.enum(["CLOCK_IN", "CLOCK_OUT"]), failureType: z.enum(["BIOMETRIC_FAILURE", "GPS_FAILURE", "CAMERA_FAILURE"]), reason: z.string().trim().min(10).max(500) }).strict();
+export async function POST(request: Request) { const collector = await authenticateTerminal(); if (!collector) return Response.json({ error: "Terminal não autorizado." }, { status: 401 }); const input = schema.safeParse(await request.json().catch(() => null)); if (!input.success) return Response.json({ error: "Informe matrícula, tipo e motivo detalhado." }, { status: 400 }); const [employee] = await db.select({ id: employees.id }).from(employees).where(and(eq(employees.registrationNumber, input.data.registrationNumber), eq(employees.status, "ACTIVE"), eq(employees.isActive, true))).limit(1); if (!employee) return Response.json({ error: "Funcionário ativo não localizado." }, { status: 404 }); const [saved] = await db.insert(contingencyRequests).values({ employeeId: employee.id, collectorId: collector.id, eventType: input.data.eventType, failureType: input.data.failureType, reason: input.data.reason }).returning({ id: contingencyRequests.id, requestedAt: contingencyRequests.requestedAt }); await recordRepPEvent(db, { eventType: "CONTINGENCY_REQUESTED", outcome: "SUCCESS", collectorId: collector.id, employeeId: employee.id, reasonCode: input.data.failureType, metadata: { requestId: saved.id } }); return Response.json(saved, { status: 201 }); }

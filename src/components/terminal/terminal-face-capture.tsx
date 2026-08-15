@@ -1,7 +1,7 @@
 "use client";
 import { Camera, LoaderCircle, ScanFace } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-type Approved = { attemptId: string; biometricValidationId: string; employeeId: string; displayName: string };
+type Approved = { attemptId: string; biometricValidationId: string; employeeId: string; displayName: string; contingencyTicket: string };
 export function TerminalFaceCapture({ locationValidationId, onCapture, onApproved, onRejected }: { locationValidationId: string; onCapture: () => void; onApproved: (result: Approved) => void; onRejected: (message: string) => void }) {
   const video = useRef<HTMLVideoElement>(null); const stream = useRef<MediaStream | undefined>(undefined); const [ready, setReady] = useState(false); const [checking, setChecking] = useState(false);
   useEffect(() => { let active = true; navigator.mediaDevices?.getUserMedia({ video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false }).then((media) => { if (!active) { media.getTracks().forEach((track) => track.stop()); return; } stream.current = media; if (video.current) video.current.srcObject = media; setReady(true); }).catch(() => onRejected("Não foi possível acessar a câmera.")); return () => { active = false; stream.current?.getTracks().forEach((track) => track.stop()); }; }, [onRejected]);

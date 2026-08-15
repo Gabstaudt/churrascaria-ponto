@@ -18,3 +18,4 @@ export * from "./portal";
 export * from "./rate-limits";
 export * from "./rep";
 export * from "./legal-settings";
+export * from "./rep-p";

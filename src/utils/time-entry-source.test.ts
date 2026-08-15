@@ -1,0 +1,4 @@
+import { describe, expect, it } from "vitest";
+import { pairTimeEntries } from "@/services/daily-attendance-core";
+import { timeEntrySourceLabel } from "./time-entry-source";
+describe("REP-C and REP-P downstream integration", () => { it("rotula as origens sem misturá-las", () => { expect(timeEntrySourceLabel("REP_C")).toBe("REP-C"); expect(timeEntrySourceLabel("REP_P")).toBe("REP-P"); }); it("apura horários equivalentes sem depender da origem", () => { const occurredAt = new Date("2026-08-15T08:00:00-03:00"); const sourceEntries: Array<{ id: string; occurredAt: Date; source: "REP_C" | "REP_P" }> = [{ id: "c", occurredAt, source: "REP_C" }, { id: "p", occurredAt, source: "REP_P" }]; const repC = pairTimeEntries([sourceEntries[0]!]); const repP = pairTimeEntries([sourceEntries[1]!]); expect(repC[0]?.entry.occurredAt).toEqual(repP[0]?.entry.occurredAt); }); });

@@ -24,7 +24,8 @@
     "rep:reconcile": "tsx scripts/reconcile-rep.ts",
     "legal:configure": "tsx scripts/configure-legal-settings.ts",
     "release:check": "tsx scripts/release-readiness.ts",
-    "test:load": "tsx scripts/load-smoke.ts"
+    "test:load": "tsx scripts/load-smoke.ts",
+    "rep-p:provision": "tsx scripts/provision-rep-p.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1109.0",

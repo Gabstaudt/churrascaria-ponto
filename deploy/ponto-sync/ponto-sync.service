@@ -1,0 +1,23 @@
+[Unit]
+Description=Ponto Sync - Churrascaria Ponto
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ponto-sync
+Group=ponto-sync
+WorkingDirectory=/opt/churrascaria-ponto/current
+EnvironmentFile=/etc/churrascaria-ponto/ponto-sync.env
+ExecStart=/usr/bin/npm run ponto-sync:run
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/churrascaria-ponto
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRightLeft, BriefcaseBusiness, CalendarDays, CalendarRange, Clock3, Edit3, FileText, Hash, Phone, PhoneCall, Plus, Umbrella, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRightLeft, BriefcaseBusiness, CalendarDays, CalendarRange, Clock3, Edit3, FileText, Hash, Phone, PhoneCall, Plus, ScanFace, Umbrella, UserRound } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -36,6 +36,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: PageP
 
   return <main className="dashboard-page employee-profile-page">
     <Link className="back-link" href="/admin/funcionarios"><ArrowLeft size={17} /> Voltar para funcionários</Link>
+    <Link className="secondary-button biometric-profile-shortcut" href={`/admin/funcionarios/${employee.id}/biometria`}><ScanFace size={17} /> Gerenciar biometria facial</Link>
     {query.updated === "1" ? <p className="success-message">Dados atualizados com sucesso.</p> : null}
     {query.deactivated === "1" ? <p className="success-message neutral">Funcionário inativado. O histórico foi preservado.</p> : null}
     {query.reactivated === "1" ? <p className="success-message">Funcionário reativado com sucesso.</p> : null}

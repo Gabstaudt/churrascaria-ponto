@@ -1,4 +1,3 @@
-import "server-only";
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 const VERSION = "aes-256-gcm-v1";
 function key() { const raw = process.env.BIOMETRIC_ENCRYPTION_KEY; if (!raw) throw new Error("BIOMETRIC_ENCRYPTION_KEY não configurada."); const value = Buffer.from(raw, "base64"); if (value.length !== 32) throw new Error("BIOMETRIC_ENCRYPTION_KEY deve possuir 32 bytes em Base64."); return value; }

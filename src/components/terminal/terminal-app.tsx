@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
-import { CheckCircle2, CloudOff, LoaderCircle, ShieldAlert } from "lucide-react";
+import { CheckCircle2, CloudOff, LoaderCircle, ScanFace, ShieldAlert } from "lucide-react";
 import { initialTerminalFlowState, terminalFlowReducer } from "@/terminal/flow-machine";
 import type { IdentifiedEmployee } from "@/terminal/identification";
 import { SynchronizedClock } from "./synchronized-clock";

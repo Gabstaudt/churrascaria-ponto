@@ -1,0 +1,5 @@
+import { z } from "zod";
+import { isValidCpf } from "./cpf";
+
+const digits = (length: number) => z.string().transform((value) => value.replace(/\D/g, "")).pipe(z.string().length(length));
+export const legalSettingsSchema = z.object({ employerName: z.string().trim().min(2).max(150), employerIdType: z.literal("CNPJ"), employerId: digits(14), caepf: z.union([z.literal(""), digits(14)]).optional(), cno: z.union([z.literal(""), digits(12)]).optional(), street: z.string().trim().min(2).max(200), district: z.string().trim().min(2).max(100), postalCode: digits(8), city: z.string().trim().min(2).max(100), state: z.string().trim().length(2).transform((value) => value.toUpperCase()), legalRepresentative: z.string().trim().min(2).max(150), employerEmail: z.email().max(255).transform((value) => value.toLowerCase()), ptrpName: z.string().trim().min(1).max(150), ptrpVersion: z.string().trim().regex(/^\d+\.\d+\.\d+$/).max(8), developerIdType: z.literal("CPF"), developerId: digits(11).refine(isValidCpf, "CPF da desenvolvedora inválido."), developerName: z.string().trim().min(2).max(150), developerEmail: z.email().max(50).transform((value) => value.toLowerCase()) }).strict();

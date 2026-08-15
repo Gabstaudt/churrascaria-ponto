@@ -120,6 +120,13 @@
       "when": 1786752310225,
       "tag": "0016_wealthy_wild_child",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1786753216328,
+      "tag": "0017_thankful_mister_fear",
+      "breakpoints": true
     }
   ]
 }

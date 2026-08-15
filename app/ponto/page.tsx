@@ -1,21 +1,6 @@
-import { Clock3 } from "lucide-react";
-import { SynchronizedClock } from "@/components/terminal/synchronized-clock";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/db";
+import { employees } from "@/db/schema";
+import { TerminalApp } from "@/components/terminal/terminal-app";
 
-export default function PointTerminalPage() {
-  return (
-    <section className="point-terminal" aria-labelledby="terminal-title">
-      <header>
-        <span className="point-terminal-mark" aria-hidden="true"><Clock3 size={30} /></span>
-        <div>
-          <p>Churrascaria Marituba</p>
-          <h1 id="terminal-title">Terminal de ponto</h1>
-        </div>
-      </header>
-      <div className="point-terminal-intro">
-        <p>Registro oficial de jornada</p>
-        <SynchronizedClock />
-      </div>
-      <button className="point-terminal-primary" type="button">Iniciar registro</button>
-    </section>
-  );
-}
+export default async function PointTerminalPage() { const developmentEmployees = process.env.NODE_ENV === "development" ? await db.select({ id: employees.id, displayName: employees.fullName, jobTitle: employees.jobTitle }).from(employees).where(eq(employees.isActive, true)).orderBy(asc(employees.fullName)) : []; return <TerminalApp developmentEmployees={developmentEmployees.map((employee) => ({ ...employee, jobTitle: employee.jobTitle ?? undefined }))} />; }

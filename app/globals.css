@@ -708,6 +708,18 @@ a { color: inherit; text-decoration: none; }
 .point-terminal-primary:active { transform: scale(.985); }
 .point-terminal-primary:disabled { cursor: wait; opacity: .65; transform: none; }
 .point-terminal-primary:focus-visible { outline: 3px solid #d6a541; outline-offset: 3px; }
+.point-terminal-center { min-height: 18rem; display: grid; align-content: center; justify-items: center; gap: .75rem; text-align: center; }
+.point-terminal-center > strong { font-size: 1.5rem; }
+.point-terminal-center p { margin: 0; color: #5e6b63; }
+.point-terminal-center select, .point-terminal-activation input { width: 100%; min-height: 3.5rem; padding: 0 1rem; border: 1px solid #bac8be; border-radius: .8rem; background: white; font: inherit; }
+.point-terminal-activation { display: grid; gap: .8rem; }
+.point-terminal-activation input { font-size: 1.6rem; font-weight: 850; letter-spacing: .3em; text-align: center; }
+.terminal-connection { display: inline-flex; align-items: center; gap: .3rem; margin-left: auto; font-size: .75rem; font-weight: 800; }
+.terminal-connection.online { color: #287044; }.terminal-connection.offline { color: #a13b32; }
+.terminal-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: 1rem; }
+.terminal-actions button { min-height: 4rem; border: 1px solid #193d2b; border-radius: .9rem; background: #193d2b; color: white; font: inherit; font-weight: 850; }
+.point-terminal-center.success { color: #287044; }.point-terminal-center.success time { font-size: 2rem; font-weight: 850; }.point-terminal-center.error { color: #9f312a; }
+.spin { animation: terminal-spin 1s linear infinite; } @keyframes terminal-spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 520px) {
   .point-terminal-shell { padding: 0; background: #fff; }

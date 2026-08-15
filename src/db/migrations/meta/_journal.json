@@ -190,6 +190,13 @@
       "when": 1786756020709,
       "tag": "0026_watery_hellcat",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1786756618686,
+      "tag": "0027_mixed_jubilee",
+      "breakpoints": true
     }
   ]
 }

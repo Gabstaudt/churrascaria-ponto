@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function PointTerminalLayout({ children }: { children: ReactNode }) {
-  return <main className="point-terminal-shell">{children}</main>;
+  return <main className="point-terminal-shell" data-kiosk="true">{children}</main>;
 }

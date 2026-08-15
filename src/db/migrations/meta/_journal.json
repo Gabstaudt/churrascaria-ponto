@@ -211,6 +211,20 @@
       "when": 1786758839641,
       "tag": "0029_tranquil_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1786810767484,
+      "tag": "0030_foamy_photon",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1786811065985,
+      "tag": "0031_secret_inhumans",
+      "breakpoints": true
     }
   ]
 }

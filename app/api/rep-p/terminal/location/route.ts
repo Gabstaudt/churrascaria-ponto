@@ -1,0 +1,5 @@
+import { authenticateTerminal } from "@/services/terminal-auth.service";
+import { validateCollectorLocation } from "@/services/geofence.service";
+import { deviceLocationSchema } from "@/validations/geofence";
+export const runtime = "nodejs";
+export async function POST(request: Request) { const collector = await authenticateTerminal(); if (!collector) return Response.json({ error: "Terminal não autorizado." }, { status: 401 }); const parsed = deviceLocationSchema.safeParse(await request.json().catch(() => null)); if (!parsed.success) return Response.json({ error: "Evidência de localização inválida." }, { status: 400 }); const validation = await validateCollectorLocation(collector.id, { ...parsed.data, capturedAt: new Date(parsed.data.capturedAt) }); if (!validation) return Response.json({ error: "Coletor inválido." }, { status: 401 }); return Response.json({ id: validation.id, status: validation.status, distanceMeters: validation.distanceMeters === null ? undefined : Number(validation.distanceMeters) }, { status: validation.status === "VALID" ? 201 : 422, headers: { "Cache-Control": "no-store" } }); }

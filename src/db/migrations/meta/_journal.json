@@ -176,6 +176,27 @@
       "when": 1786754877361,
       "tag": "0024_cultured_moondragon",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1786755936765,
+      "tag": "0025_unknown_mandarin",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1786756020709,
+      "tag": "0026_watery_hellcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1786756618686,
+      "tag": "0027_mixed_jubilee",
+      "breakpoints": true
     }
   ]
 }

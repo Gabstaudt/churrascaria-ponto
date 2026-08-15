@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, CalendarCheck2, CalendarDays, CalendarRange, KeyRound, LayoutDashboard, Scale, ShieldCheck, UsersRound } from "lucide-react";
+import { BarChart3, CalendarCheck2, CalendarDays, CalendarRange, KeyRound, LayoutDashboard, MonitorSmartphone, Scale, ShieldCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -13,6 +13,7 @@ const links = [
   { href: "/admin/banco-horas", label: "Banco de horas", icon: Scale, exact: false, desktopOnly: true },
   { href: "/admin/fechamentos", label: "Fechamentos", icon: CalendarCheck2, exact: false, desktopOnly: true },
   { href: "/admin/acessos", label: "Acessos", icon: KeyRound, exact: false, desktopOnly: true },
+  { href: "/admin/terminais", label: "Terminais", icon: MonitorSmartphone, exact: false, desktopOnly: true },
   { href: "/admin/relatorios", label: "Relatórios", icon: BarChart3, exact: false, desktopOnly: true },
 ];
 

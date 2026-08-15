@@ -687,6 +687,61 @@ a { color: inherit; text-decoration: none; }
   .schedule-form .schedule-time-grid label:last-child { grid-column: auto; }
 }
 
+/* Sprint 26: isolated point terminal. Never share these rules with admin screens. */
+.point-terminal-shell { min-height: 100dvh; display: grid; place-items: center; padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left)); overflow: hidden auto; background: #edf2ee; color-scheme: light; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.point-terminal { width: min(100%, 34rem); display: grid; gap: 2rem; padding: clamp(1.5rem, 5vw, 2.5rem); border: 1px solid #d7e0d9; border-radius: 1.5rem; background: #fff; box-shadow: 0 18px 60px rgb(24 52 37 / 10%); }
+.point-terminal > header { display: flex; align-items: center; gap: .85rem; }
+.point-terminal > header p { margin: 0; color: #526158; font-size: .78rem; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+.point-terminal > header h1 { margin: .15rem 0 0; color: #193d2b; font-size: 1.25rem; }
+.point-terminal-mark { width: 3.25rem; height: 3.25rem; display: grid; flex: 0 0 auto; place-items: center; border-radius: .9rem; background: #193d2b; color: white; }
+.point-terminal-intro { display: grid; gap: .55rem; padding-block: clamp(1rem, 7vh, 3rem); text-align: center; }
+.point-terminal-intro p, .point-terminal-intro span { margin: 0; color: #5e6b63; }
+.point-terminal-intro p { font-size: .82rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.point-terminal-intro strong { color: #18241d; font-size: clamp(1.6rem, 6vw, 2.35rem); line-height: 1.1; }
+.point-terminal-intro span { font-size: .86rem; line-height: 1.5; }
+.point-terminal-clock { display: grid; gap: .25rem; margin-top: .8rem; }
+.point-terminal-clock time { color: #18241d; font-size: clamp(3rem, 13vw, 5rem); font-variant-numeric: tabular-nums; font-weight: 850; letter-spacing: -.06em; line-height: 1; }
+.point-terminal-clock > span { color: #34473c; font-size: 1rem; text-transform: capitalize; }
+.point-terminal-clock small { margin-top: .6rem; color: #6c776f; font-size: .72rem; }
+.point-terminal-primary { min-height: 4rem; border: 0; border-radius: 1rem; background: #193d2b; color: white; font: inherit; font-size: 1rem; font-weight: 850; cursor: pointer; transition: transform 120ms ease, background 120ms ease; }
+.point-terminal-primary:hover { background: #24573e; }
+.point-terminal-primary:active { transform: scale(.985); }
+.point-terminal-primary:disabled { cursor: wait; opacity: .65; transform: none; }
+.point-terminal-primary:focus-visible { outline: 3px solid #d6a541; outline-offset: 3px; }
+.point-terminal-center { min-height: 18rem; display: grid; align-content: center; justify-items: center; gap: .75rem; text-align: center; }
+.point-terminal-center > strong { font-size: 1.5rem; }
+.point-terminal-center p { margin: 0; color: #5e6b63; }
+.point-terminal-center select, .point-terminal-activation input { width: 100%; min-height: 3.5rem; padding: 0 1rem; border: 1px solid #bac8be; border-radius: .8rem; background: white; font: inherit; }
+.point-terminal-activation { display: grid; gap: .8rem; }
+.point-terminal-activation input { font-size: 1.6rem; font-weight: 850; letter-spacing: .3em; text-align: center; }
+.terminal-connection { display: inline-flex; align-items: center; gap: .3rem; margin-left: auto; font-size: .75rem; font-weight: 800; }
+.terminal-connection.online { color: #287044; }.terminal-connection.offline { color: #a13b32; }
+.terminal-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: 1rem; }
+.terminal-actions button { min-height: 4rem; border: 1px solid #193d2b; border-radius: .9rem; background: #193d2b; color: white; font: inherit; font-weight: 850; }
+.point-terminal-center.success { color: #287044; }.point-terminal-center.success time { font-size: 2rem; font-weight: 850; }.point-terminal-center.error { color: #9f312a; }
+.spin { animation: terminal-spin 1s linear infinite; } @keyframes terminal-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 520px) {
+  .point-terminal-shell { padding: 0; background: #fff; }
+  .point-terminal { min-height: 100dvh; align-content: space-between; padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left)); border: 0; border-radius: 0; box-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .point-terminal-primary { transition: none; }
+}
+
+.terminals-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.terminals-panel > header { display: flex; justify-content: space-between; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.terminals-panel h2, .terminals-panel p { margin: 0; }.terminals-panel header p, .terminals-panel header span { color: var(--muted); font-size: .74rem; }
+.terminal-admin-list article { display: grid; grid-template-columns: auto minmax(12rem, 1.4fr) auto minmax(9rem, .8fr) 5rem auto; align-items: center; gap: .8rem; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); }
+.terminal-admin-icon { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: .7rem; background: #e6efe8; color: var(--brand); }
+.terminal-admin-list article > div { display: grid; gap: .2rem; }.terminal-admin-list small { color: var(--muted); font-size: .7rem; }
+.terminal-admin-status { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 850; }.terminal-admin-status.online { color: #287044; }.terminal-admin-status.offline, .terminal-admin-status.inativo { color: #6b756e; }.terminal-admin-status.bloqueado { color: #9f312a; }
+.terminal-admin-actions { display: flex !important; gap: .4rem; }.terminal-admin-actions button { min-height: 2.35rem; padding: 0 .7rem; border: 1px solid var(--line); border-radius: .55rem; background: white; color: var(--brand); font-weight: 800; cursor: pointer; }.terminal-admin-actions button.danger { color: #9f312a; }
+.terminal-admin-empty { padding: 2rem; color: var(--muted); text-align: center; }
+@media (max-width: 900px) { .terminal-admin-list article { grid-template-columns: auto 1fr auto; }.terminal-admin-meta { grid-column: span 1; }.terminal-admin-actions { grid-column: 1 / -1; }.terminal-admin-actions form, .terminal-admin-actions button { flex: 1; width: 100%; } }
+@media (max-width: 560px) { .terminal-admin-list article { grid-template-columns: auto 1fr; }.terminal-admin-status { grid-column: 2; }.terminal-admin-meta { grid-column: 1 / -1; }.terminal-admin-actions { flex-direction: column; } }
+
 /* Sprint 18: operational reports, isolated from existing journeys. */
 .reports-page { width: 100%; max-width: 1180px; margin-inline: auto; }
 .reports-heading { align-items: flex-end; }

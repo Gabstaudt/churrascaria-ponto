@@ -1,0 +1,8 @@
+import type { IdentifiedEmployee } from "./identification";
+
+export type TerminalFlowStatus = "IDLE" | "IDENTIFYING" | "VALIDATING" | "READY" | "REGISTERING" | "SUCCESS" | "ERROR";
+export type TerminalFlowState = { status: TerminalFlowStatus; employee?: IdentifiedEmployee; result?: { eventLabel: string; recordedAt: string; nsr: string }; error?: string };
+export type TerminalFlowEvent = { type: "START" } | { type: "IDENTIFIED"; employee: IdentifiedEmployee } | { type: "VALIDATED" } | { type: "REGISTER" } | { type: "SUCCEEDED"; result: NonNullable<TerminalFlowState["result"]> } | { type: "FAILED"; message: string } | { type: "RESET" };
+export const initialTerminalFlowState: TerminalFlowState = { status: "IDLE" };
+
+export function terminalFlowReducer(state: TerminalFlowState, event: TerminalFlowEvent): TerminalFlowState { if (event.type === "RESET") return initialTerminalFlowState; switch (state.status) { case "IDLE": return event.type === "START" ? { status: "IDENTIFYING" } : state; case "IDENTIFYING": return event.type === "IDENTIFIED" ? { status: "VALIDATING", employee: event.employee } : event.type === "FAILED" ? { status: "ERROR", error: event.message } : state; case "VALIDATING": return event.type === "VALIDATED" ? { ...state, status: "READY" } : event.type === "FAILED" ? { status: "ERROR", error: event.message } : state; case "READY": return event.type === "REGISTER" ? { ...state, status: "REGISTERING" } : state; case "REGISTERING": return event.type === "SUCCEEDED" ? { ...state, status: "SUCCESS", result: event.result } : event.type === "FAILED" ? { status: "ERROR", error: event.message } : state; default: return state; } }

@@ -1,0 +1,1 @@
+ALTER TABLE "rep_collectors" ADD COLUMN "terminal_version" varchar(30);

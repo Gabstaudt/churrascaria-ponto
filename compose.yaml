@@ -1,4 +1,11 @@
 services:
+  biometrics:
+    build: ./services/biometrics
+    restart: unless-stopped
+    environment:
+      BIOMETRIC_PROVIDER_TOKEN: ${BIOMETRIC_PROVIDER_TOKEN}
+    ports:
+      - "127.0.0.1:8100:8100"
   postgres:
     image: postgres:17-alpine
     container_name: churrascaria-ponto-postgres

@@ -183,6 +183,13 @@
       "when": 1786755936765,
       "tag": "0025_unknown_mandarin",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1786756020709,
+      "tag": "0026_watery_hellcat",
+      "breakpoints": true
     }
   ]
 }

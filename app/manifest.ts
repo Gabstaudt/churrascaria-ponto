@@ -1,0 +1,2 @@
+import type { MetadataRoute } from "next";
+export default function manifest(): MetadataRoute.Manifest { return { name: "UpTime — Terminal de Ponto", short_name: "PONTO", description: "Terminal oficial de registro de ponto", start_url: "/ponto", display: "standalone", orientation: "portrait", background_color: "#ffffff", theme_color: "#193d2b", icons: [{ src: "/terminal-icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }] }; }

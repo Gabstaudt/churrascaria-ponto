@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { canAuthorizeContingency } from "./contingency-authorization.policy";
+describe("autorização de contingência", () => { it("autoriza somente admin sem autoaprovação", () => { expect(canAuthorizeContingency({ role: "ADMIN", contingencyEmployeeId: "employee" })).toBe(true); expect(canAuthorizeContingency({ role: "MANAGER", contingencyEmployeeId: "employee" })).toBe(false); expect(canAuthorizeContingency({ role: "EMPLOYEE", userEmployeeId: "employee", contingencyEmployeeId: "employee" })).toBe(false); expect(canAuthorizeContingency({ role: "ADMIN", userEmployeeId: "employee", contingencyEmployeeId: "employee" })).toBe(false); }); });

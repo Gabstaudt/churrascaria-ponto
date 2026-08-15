@@ -1,0 +1,1 @@
+export function canAuthorizeContingency(input: { role: string; userEmployeeId?: string | null; contingencyEmployeeId: string }) { return input.role === "ADMIN" && input.userEmployeeId !== input.contingencyEmployeeId; }

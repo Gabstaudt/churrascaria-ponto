@@ -225,6 +225,13 @@
       "when": 1786811065985,
       "tag": "0031_secret_inhumans",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1786822922949,
+      "tag": "0032_moaning_deathbird",
+      "breakpoints": true
     }
   ]
 }

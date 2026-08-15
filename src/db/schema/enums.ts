@@ -24,6 +24,8 @@ export const requestStatusValues = ["PENDING", "APPROVED", "REJECTED"] as const;
 export const correctionRequestTypeValues = ["ADD_ENTRY", "IGNORE_ENTRY", "FORGOTTEN_EXIT", "OTHER"] as const;
 export const medicalCertificateStatusValues = ["PENDING", "APPROVED", "REJECTED"] as const;
 export const repSyncStatusValues = ["RECEIVED", "PROCESSED", "PARTIAL", "FAILED"] as const;
+export const repModeValues = ["REP_C", "REP_P"] as const;
+export const repRegistrarStatusValues = ["DRAFT", "ACTIVE", "INACTIVE", "BLOCKED"] as const;
 
 export type EmployeeStatus = (typeof employeeStatusValues)[number];
 
@@ -45,3 +47,5 @@ export const requestStatusEnum = pgEnum("request_status", requestStatusValues);
 export const correctionRequestTypeEnum = pgEnum("correction_request_type", correctionRequestTypeValues);
 export const medicalCertificateStatusEnum = pgEnum("medical_certificate_status", medicalCertificateStatusValues);
 export const repSyncStatusEnum = pgEnum("rep_sync_status", repSyncStatusValues);
+export const repModeEnum = pgEnum("rep_mode", repModeValues);
+export const repRegistrarStatusEnum = pgEnum("rep_registrar_status", repRegistrarStatusValues);

@@ -1,0 +1,11 @@
+export type GeofenceStatus = "VALID" | "OUTSIDE_GEOFENCE" | "LOW_ACCURACY" | "PERMISSION_DENIED" | "UNAVAILABLE" | "EXPIRED" | "SUSPICIOUS";
+export type LocationRiskFlag = "MOCK_LOCATION_SUSPECTED" | "IMPOSSIBLE_TRAVEL" | "LOW_ACCURACY" | "DEVICE_INCONSISTENCY";
+export type Coordinates = { latitude: number; longitude: number };
+export type LocationEvidence = Coordinates & { accuracyMeters: number; capturedAt: Date; source: "DEVICE_GEOLOCATION"; riskFlags?: LocationRiskFlag[] };
+export type GeofencePolicy = Coordinates & { enabled: boolean; radiusMeters: number; maximumAccuracyMeters: number; maxAgeSeconds: number };
+
+const EARTH_RADIUS_METERS = 6_371_000;
+const radians = (degrees: number) => degrees * Math.PI / 180;
+export function haversineDistanceMeters(from: Coordinates, to: Coordinates) { const dLat = radians(to.latitude - from.latitude); const dLon = radians(to.longitude - from.longitude); const a = Math.sin(dLat / 2) ** 2 + Math.cos(radians(from.latitude)) * Math.cos(radians(to.latitude)) * Math.sin(dLon / 2) ** 2; return EARTH_RADIUS_METERS * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); }
+export function validCoordinates(value: Coordinates) { return Number.isFinite(value.latitude) && value.latitude >= -90 && value.latitude <= 90 && Number.isFinite(value.longitude) && value.longitude >= -180 && value.longitude <= 180; }
+export function validateGeofence(evidence: LocationEvidence, policy: GeofencePolicy, now = new Date()): { status: GeofenceStatus; distanceMeters?: number; riskFlags: LocationRiskFlag[] } { const riskFlags = [...(evidence.riskFlags ?? [])]; if (!validCoordinates(evidence) || !Number.isFinite(evidence.accuracyMeters) || evidence.accuracyMeters <= 0) return { status: "SUSPICIOUS", riskFlags: ["MOCK_LOCATION_SUSPECTED", ...riskFlags] }; if (now.getTime() - evidence.capturedAt.getTime() > policy.maxAgeSeconds * 1_000 || evidence.capturedAt.getTime() > now.getTime() + 5_000) return { status: "EXPIRED", riskFlags }; const distanceMeters = haversineDistanceMeters(evidence, policy); if (evidence.accuracyMeters > policy.maximumAccuracyMeters) return { status: "LOW_ACCURACY", distanceMeters, riskFlags: ["LOW_ACCURACY", ...riskFlags] }; return { status: distanceMeters <= policy.radiusMeters ? "VALID" : "OUTSIDE_GEOFENCE", distanceMeters, riskFlags }; }

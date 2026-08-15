@@ -1,0 +1,3 @@
+import { z } from "zod";
+export const geofenceSettingsSchema = z.object({ latitude: z.coerce.number().min(-90).max(90), longitude: z.coerce.number().min(-180).max(180), geofenceRadiusMeters: z.coerce.number().min(5).max(5_000), minimumLocationAccuracyMeters: z.coerce.number().min(1).max(1_000), locationMaxAgeSeconds: z.coerce.number().int().min(5).max(300), geofenceEnabled: z.boolean(), reason: z.string().trim().min(10).max(500) }).strict();
+export const deviceLocationSchema = z.object({ latitude: z.number().finite().min(-90).max(90), longitude: z.number().finite().min(-180).max(180), accuracyMeters: z.number().finite().positive().max(100_000), capturedAt: z.iso.datetime(), source: z.literal("DEVICE_GEOLOCATION") }).strict();

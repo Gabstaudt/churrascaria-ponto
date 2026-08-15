@@ -1,5 +1,5 @@
 import { Clock3 } from "lucide-react";
-import { TerminalClock } from "@/components/terminal/terminal-clock";
+import { SynchronizedClock } from "@/components/terminal/synchronized-clock";
 
 export default function PointTerminalPage() {
   return (
@@ -13,7 +13,7 @@ export default function PointTerminalPage() {
       </header>
       <div className="point-terminal-intro">
         <p>Registro oficial de jornada</p>
-        <TerminalClock />
+        <SynchronizedClock />
       </div>
       <button className="point-terminal-primary" type="button">Iniciar registro</button>
     </section>

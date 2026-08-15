@@ -3,7 +3,7 @@ import Link from "next/link";
 import { listTimeEntries } from "@/services/time-entry.service";
 import { listEligibleEmployees } from "@/services/work-schedule.service";
 
-const sourceLabels = { SIMULATOR: "Simulador", IMPORT: "Importação", REP_C: "REP-C" } as const;
+const sourceLabels = { SIMULATOR: "Simulador", IMPORT: "Importação", REP_C: "REP-C", REP_P: "REP-P" } as const;
 function validDate(value: unknown) { return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined; }
 function formatDateTime(value: Date) { return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Belem" }).format(value); }
 

@@ -18,7 +18,7 @@ export async function importSimulatedTimeEntries(input: SimulatedTimeEntriesInpu
   });
 }
 
-export async function listTimeEntries(input: { employeeId?: string; start?: Date; end?: Date; source?: "SIMULATOR" | "IMPORT" | "REP_C" } = {}) {
+export async function listTimeEntries(input: { employeeId?: string; start?: Date; end?: Date; source?: "SIMULATOR" | "IMPORT" | "REP_C" | "REP_P" } = {}) {
   const conditions = [];
   if (input.employeeId) conditions.push(eq(timeEntries.employeeId, input.employeeId));
   if (input.start) conditions.push(gte(timeEntries.occurredAt, input.start));

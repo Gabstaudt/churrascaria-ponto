@@ -1,0 +1,2 @@
+ALTER TABLE "time_entries" ADD COLUMN "idempotency_key" varchar(100);--> statement-breakpoint
+CREATE UNIQUE INDEX "time_entries_collector_idempotency_unique" ON "time_entries" USING btree ("collector_id","idempotency_key");

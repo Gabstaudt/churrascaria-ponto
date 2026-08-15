@@ -14,6 +14,7 @@ export const timeEntries = pgTable("time_entries", {
   registrarId: uuid("registrar_id").references(() => repRegistrars.id, { onDelete: "restrict" }),
   collectorId: uuid("collector_id").references(() => repCollectors.id, { onDelete: "restrict" }),
   nsr: varchar("nsr", { length: 30 }),
+  idempotencyKey: varchar("idempotency_key", { length: 100 }),
   metadata: jsonb("metadata").$type<Record<string, unknown>>(),
   receivedAt: timestamp("received_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
@@ -23,6 +24,7 @@ export const timeEntries = pgTable("time_entries", {
   index("time_entries_occurred_idx").on(table.occurredAt),
   uniqueIndex("time_entries_registrar_nsr_unique").on(table.registrarId, table.nsr),
   index("time_entries_establishment_idx").on(table.establishmentId, table.occurredAt),
+  uniqueIndex("time_entries_collector_idempotency_unique").on(table.collectorId, table.idempotencyKey),
 ]);
 
 export type TimeEntry = typeof timeEntries.$inferSelect;

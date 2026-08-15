@@ -18,6 +18,7 @@ export const timeEntries = pgTable("time_entries", {
     locationValidationId: uuid("location_validation_id"),
     biometricValidationId: uuid("biometric_validation_id"),
     registrationAttemptId: uuid("registration_attempt_id"),
+    contingencyEventId: uuid("contingency_event_id"),
   metadata: jsonb("metadata").$type<Record<string, unknown>>(),
   receivedAt: timestamp("received_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),

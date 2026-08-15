@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { officialRecordedAt, REP_P_OFFICIAL_TIMEZONE } from "./official-clock.service";
+describe("REP-P official clock", () => { it("usa exclusivamente o relógio injetado no backend", () => { const official = new Date("2026-08-15T01:00:00.000Z"); expect(officialRecordedAt({ now: () => official })).toEqual(official); expect(REP_P_OFFICIAL_TIMEZONE).toBe("America/Belem"); }); it("retorna cópia imutável do instante", () => { const source = new Date("2026-08-15T01:00:00.000Z"); const result = officialRecordedAt({ now: () => source }); source.setFullYear(2000); expect(result.toISOString()).toBe("2026-08-15T01:00:00.000Z"); }); });

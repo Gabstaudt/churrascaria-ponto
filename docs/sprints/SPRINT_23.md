@@ -9,6 +9,12 @@
 - codificação ISO-8859-1, separador pipe e final de linha CRLF;
 - marcador previsto para assinatura CAdES destacada;
 - testes automatizados com exemplos oficiais de marcação.
+- cadastro jurídico único por instalação;
+- separação entre empregador e desenvolvedora pessoa física;
+- PTRP configurado como `UpTime`, com versão derivada da instalação;
+- normalização e validação de CNPJ, CPF, CEP, UF e e-mails;
+- comando seguro e auditado para configuração, sem dados pessoais no código;
+- trava persistente que mantém exportações oficiais desabilitadas após alterações.
 
 ## Bloqueios formais
 

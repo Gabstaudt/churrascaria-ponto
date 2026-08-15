@@ -19,7 +19,9 @@
     "restore:db": "bash scripts/restore-database.sh",
     "rep:device:create": "tsx scripts/create-rep-device.ts",
     "ponto-sync:run": "tsx scripts/ponto-sync.ts",
-    "ponto-sync:diagnose": "tsx scripts/ponto-sync-diagnose.ts"
+    "ponto-sync:diagnose": "tsx scripts/ponto-sync-diagnose.ts",
+    "rep:monitor": "tsx scripts/monitor-rep.ts",
+    "rep:reconcile": "tsx scripts/reconcile-rep.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1109.0",

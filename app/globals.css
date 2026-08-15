@@ -730,6 +730,18 @@ a { color: inherit; text-decoration: none; }
   .point-terminal-primary { transition: none; }
 }
 
+.terminals-page { width: 100%; max-width: 1180px; margin-inline: auto; }
+.terminals-panel > header { display: flex; justify-content: space-between; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); background: #f8faf8; }
+.terminals-panel h2, .terminals-panel p { margin: 0; }.terminals-panel header p, .terminals-panel header span { color: var(--muted); font-size: .74rem; }
+.terminal-admin-list article { display: grid; grid-template-columns: auto minmax(12rem, 1.4fr) auto minmax(9rem, .8fr) 5rem auto; align-items: center; gap: .8rem; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); }
+.terminal-admin-icon { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: .7rem; background: #e6efe8; color: var(--brand); }
+.terminal-admin-list article > div { display: grid; gap: .2rem; }.terminal-admin-list small { color: var(--muted); font-size: .7rem; }
+.terminal-admin-status { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 850; }.terminal-admin-status.online { color: #287044; }.terminal-admin-status.offline, .terminal-admin-status.inativo { color: #6b756e; }.terminal-admin-status.bloqueado { color: #9f312a; }
+.terminal-admin-actions { display: flex !important; gap: .4rem; }.terminal-admin-actions button { min-height: 2.35rem; padding: 0 .7rem; border: 1px solid var(--line); border-radius: .55rem; background: white; color: var(--brand); font-weight: 800; cursor: pointer; }.terminal-admin-actions button.danger { color: #9f312a; }
+.terminal-admin-empty { padding: 2rem; color: var(--muted); text-align: center; }
+@media (max-width: 900px) { .terminal-admin-list article { grid-template-columns: auto 1fr auto; }.terminal-admin-meta { grid-column: span 1; }.terminal-admin-actions { grid-column: 1 / -1; }.terminal-admin-actions form, .terminal-admin-actions button { flex: 1; width: 100%; } }
+@media (max-width: 560px) { .terminal-admin-list article { grid-template-columns: auto 1fr; }.terminal-admin-status { grid-column: 2; }.terminal-admin-meta { grid-column: 1 / -1; }.terminal-admin-actions { flex-direction: column; } }
+
 /* Sprint 18: operational reports, isolated from existing journeys. */
 .reports-page { width: 100%; max-width: 1180px; margin-inline: auto; }
 .reports-heading { align-items: flex-end; }

@@ -1,0 +1,9 @@
+export type FaceQuality = "GOOD" | "TOO_DARK" | "TOO_BRIGHT" | "BLURRY" | "FACE_TOO_SMALL" | "FACE_NOT_CENTERED" | "MULTIPLE_FACES" | "FACE_NOT_FOUND";
+export type LivenessStatus = "PASSED" | "FAILED" | "INCONCLUSIVE";
+export type MatchStatus = "MATCH" | "NO_MATCH" | "AMBIGUOUS";
+export type BiometricRiskFlag = "PHOTO_ATTACK_SUSPECTED" | "VIDEO_ATTACK_SUSPECTED" | "SCREEN_REPLAY_SUSPECTED" | "MULTIPLE_FACES" | "LIVENESS_LOW_CONFIDENCE";
+export type DetectionResult = { faceCount: number; quality: FaceQuality; durationMs: number };
+export type LivenessResult = { status: LivenessStatus; score?: number; method: "PASSIVE" | "ACTIVE"; riskFlags: BiometricRiskFlag[]; durationMs: number };
+export type EnrollmentResult = { template: number[]; quality: FaceQuality; liveness: LivenessResult; provider: string; algorithmVersion: string };
+export type IdentificationCandidate = { employeeId: string; template: number[] };
+export type IdentificationResult = { employeeId?: string; score?: number; secondBestScore?: number; decision: MatchStatus; detection: DetectionResult; liveness: LivenessResult; provider: string; algorithmVersion: string; durationMs: number };

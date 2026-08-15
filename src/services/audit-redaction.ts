@@ -3,6 +3,7 @@ const REDACTED = "[OCULTO]";
 const blockedKeys = [
   "password", "senha", "token", "secret", "segredo", "authorization",
   "cookie", "session", "hash", "credential", "apikey", "api_key",
+  "biometric", "template", "embedding", "image", "frame", "selfie", "livenessscore", "similarityscore",
 ];
 
 function normalizedKey(key: string) {

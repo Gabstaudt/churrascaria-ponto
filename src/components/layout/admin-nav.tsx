@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, CalendarCheck2, CalendarDays, CalendarRange, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ShieldCheck, UsersRound } from "lucide-react";
+import { BarChart3, CalendarCheck2, CalendarDays, CalendarRange, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -15,6 +15,7 @@ const links = [
   { href: "/admin/acessos", label: "Acessos", icon: KeyRound, exact: false, desktopOnly: true },
   { href: "/admin/terminais", label: "Terminais", icon: MonitorSmartphone, exact: false, desktopOnly: true },
   { href: "/admin/geofence", label: "Geofence", icon: MapPin, exact: false, desktopOnly: true },
+  { href: "/admin/biometria", label: "Biometria", icon: ScanFace, exact: false, desktopOnly: true },
   { href: "/admin/relatorios", label: "Relatórios", icon: BarChart3, exact: false, desktopOnly: true },
 ];
 

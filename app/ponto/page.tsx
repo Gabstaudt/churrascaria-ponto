@@ -1,4 +1,5 @@
 import { Clock3 } from "lucide-react";
+import { TerminalClock } from "@/components/terminal/terminal-clock";
 
 export default function PointTerminalPage() {
   return (
@@ -12,8 +13,7 @@ export default function PointTerminalPage() {
       </header>
       <div className="point-terminal-intro">
         <p>Registro oficial de jornada</p>
-        <strong>Inicie seu registro de ponto</strong>
-        <span>O horário oficial será confirmado pelo servidor.</span>
+        <TerminalClock />
       </div>
       <button className="point-terminal-primary" type="button">Iniciar registro</button>
     </section>

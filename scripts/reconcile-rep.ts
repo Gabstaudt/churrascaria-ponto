@@ -1,0 +1,8 @@
+import { readFile } from "node:fs/promises";
+import { loadEnvConfig } from "@next/env";
+import { eq } from "drizzle-orm";
+import { mockRepBatchSchema } from "../src/validations/rep";
+loadEnvConfig(process.cwd());
+
+async function main() { const [{ db, postgresClient }, { repDevices, users }, { reconcileREPDevice }] = await Promise.all([import("../src/db/connection"), import("../src/db/schema"), import("../src/services/rep-pilot.service")]); try { const deviceId = process.env.REP_RECONCILE_DEVICE_ID; const file = process.env.REP_RECONCILE_FILE; const email = process.env.REP_RECONCILE_ADMIN_EMAIL?.trim().toLowerCase(); if (!deviceId || !file || !email) throw new Error("Defina REP_RECONCILE_DEVICE_ID, REP_RECONCILE_FILE e REP_RECONCILE_ADMIN_EMAIL."); const [[device], [admin]] = await Promise.all([db.select({ id: repDevices.id }).from(repDevices).where(eq(repDevices.id, deviceId)).limit(1), db.select({ id: users.id, role: users.role }).from(users).where(eq(users.email, email)).limit(1)]); if (!device || !admin || admin.role !== "ADMIN") throw new Error("Dispositivo ou administrador inválido."); const payload: unknown = JSON.parse(await readFile(file, "utf8")); const parsed = mockRepBatchSchema.parse(payload); const result = await reconcileREPDevice(device.id, `arquivo:${file.split("/").pop()}`, parsed.records, admin.id, process.env.REP_RECONCILE_NOTES); console.info(JSON.stringify(result, null, 2)); } finally { await postgresClient.end(); } }
+main().catch((error: unknown) => { console.error(error instanceof Error ? error.message : "Conciliação REP falhou."); process.exitCode = 1; });

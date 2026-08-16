@@ -1,4 +1,4 @@
-import { chainedClockHash, digits } from "../layout/afd-layout-004";
+import { appendCrc, chainedClockHash, digits } from "../layout/afd-layout-004";
 import { decodeLatin1 } from "../serializers/latin1";
 import type { AfdClockRecord, AfdRecord, AfdSource, AfdValidationIssue } from "../types";
 
@@ -47,6 +47,7 @@ export function validateSerializedAfd(bytes: Uint8Array) {
   if (!text.endsWith("\r\n") || /(^|\r\n)\r\n/.test(text)) issues.push({ severity: "ERROR", code: "INVALID_LINE_ENDING", message: "Quebra de linha ou linha em branco inválida." });
   const lines = text.slice(0, -2).split("\r\n");
   if (lines[0]?.length !== 302) issues.push({ severity: "ERROR", code: "INVALID_HEADER_LENGTH", message: "Cabeçalho fora do tamanho oficial." });
+  else if (appendCrc(lines[0].slice(0, -4)) !== lines[0]) issues.push({ severity: "ERROR", code: "INVALID_HEADER_CRC", message: "CRC-16/KERMIT do cabeçalho é inválido." });
   if (lines.at(-2)?.length !== 64) issues.push({ severity: "ERROR", code: "INVALID_TRAILER_LENGTH", message: "Trailer fora do tamanho oficial." });
   if (lines.at(-1)?.length !== 100) issues.push({ severity: "ERROR", code: "INVALID_SIGNATURE_LENGTH", message: "Registro de assinatura fora do tamanho oficial." });
   let previousHash = "";

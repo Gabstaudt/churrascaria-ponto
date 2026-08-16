@@ -4,7 +4,7 @@ import { type AfdArtifact, type AfdSource } from "../types";
 import { validateAfdSource, validateAfdStructure, validateSerializedAfd } from "../validators/afd.validator";
 
 export function generateAfdArtifact(source: AfdSource, startDate: string, endDate: string, generatedAt: Date): AfdArtifact {
-  const clocks = [...source.entries].sort((a, b) => a.nsr - b.nsr);
+  const clocks = source.entries.map((entry) => ({ ...entry })).sort((a, b) => a.nsr - b.nsr);
   const records = [createAfdHeader(source, startDate, endDate, generatedAt), ...clocks, createAfdTrailer(clocks.length), { type: "SIGNATURE" as const, value: "ASSINATURA_DIGITAL_EM_ARQUIVO_P7S" as const }];
   const issues = [...validateAfdSource(source, clocks), ...validateAfdStructure(records)];
   const serialized = serializeAfd(records, source.establishment.timezone);

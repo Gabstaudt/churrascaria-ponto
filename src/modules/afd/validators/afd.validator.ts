@@ -17,6 +17,7 @@ export function validateAfdSource(source: AfdSource, records: AfdClockRecord[]) 
   const issues: AfdValidationIssue[] = [];
   if (source.registrar.mode !== "REP_P") issues.push({ severity: "ERROR", code: "INVALID_REGISTRAR_MODE", message: "O registrador selecionado não é REP-P." });
   if (source.registrar.status !== "ACTIVE") issues.push({ severity: "ERROR", code: "INACTIVE_REGISTRAR", message: "O registrador não está ativo." });
+  if (!/^\d{1,17}$/.test(source.registrar.inpiRegistration ?? "")) issues.push({ severity: "ERROR", code: "INPI_REGISTRATION_REQUIRED", message: "Informe o número de registro do REP-P no INPI antes da emissão oficial." });
   if (!(source.employer.idType === "CPF" ? validCpf(source.employer.id) : validCnpj(source.employer.id))) issues.push({ severity: "ERROR", code: "INVALID_EMPLOYER_DOCUMENT", message: "CPF/CNPJ do empregador é inválido." });
   const seen = new Set<number>();
   records.forEach((record, index) => {

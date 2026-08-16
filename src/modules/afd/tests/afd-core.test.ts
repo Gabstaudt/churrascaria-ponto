@@ -7,7 +7,7 @@ import type { AfdSource } from "../types";
 
 function source(nsrs = [1, 2]): AfdSource {
   return {
-    registrar: { id: "registrar", name: "REP-P Marituba", identifier: "BR5120261234567", status: "ACTIVE", mode: "REP_P" },
+    registrar: { id: "registrar", name: "REP-P Marituba", identifier: "REP-P-UPTIME", inpiRegistration: "51202612345678901", status: "ACTIVE", mode: "REP_P" },
     establishment: { id: "establishment", name: "Marituba", cnpj: "16912959000133", timezone: "America/Belem" },
     employer: { name: "CHURRASCARIA MARITUBA COMERCIO E SERVICOS LTDA", idType: "CNPJ", id: "16912959000133" },
     developer: { idType: "CPF", id: "01951956206" },

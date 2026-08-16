@@ -17,6 +17,10 @@ export async function createPrivateUploadUrl(key: string, contentType: string) {
   return getSignedUrl(client, new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType }), { expiresIn: 300 });
 }
 
+export async function putPrivateObject(key: string, body: Uint8Array, contentType: string, metadata: Record<string, string> = {}) { const { bucket, client } = configuration(); await client.send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: body, ContentType: contentType, Metadata: metadata })); }
+
+export async function getPrivateObjectBytes(key: string) { const { bucket, client } = configuration(); const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key })); if (!result.Body) throw new Error("Objeto privado sem conteúdo."); return new Uint8Array(await result.Body.transformToByteArray()); }
+
 export async function inspectPrivateObject(key: string) {
   const { bucket, client } = configuration();
   const result = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));

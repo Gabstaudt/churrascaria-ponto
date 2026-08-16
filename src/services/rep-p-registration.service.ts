@@ -1,17 +1,233 @@
 import "server-only";
+
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { employees, establishments, repCollectors, repConfigurations, repRegistrars, timeEntries } from "@/db/schema";
+import {
+  employees,
+  establishments,
+  repCollectors,
+  repConfigurations,
+  repRegistrars,
+  timeEntries,
+} from "@/db/schema";
+import { generatePointReceipt } from "@/modules/point-receipts/services/point-receipt.service";
 import { recordRepPEvent } from "@/rep-p/audit.service";
 import { nextRepPNsr } from "@/rep-p/nsr.service";
-import { officialRecordedAt, type OfficialClock, systemOfficialClock } from "@/rep-p/official-clock.service";
-import { assertRepPRegistrationContext, assertRepPReplayMatches, repPRequestFingerprint, RepPRegistrationError } from "@/rep-p/registration-core";
-export type RegisterRepPPointInput = { employeeId: string; collectorId: string; eventType: "CLOCK_IN" | "CLOCK_OUT"; idempotencyKey: string; locationValidationId?: string; biometricValidationId?: string; registrationAttemptId?: string; contingencyEventId?: string; trustedOccurredAt?: Date; contingency?: boolean };
+import {
+  officialRecordedAt,
+  type OfficialClock,
+  systemOfficialClock,
+} from "@/rep-p/official-clock.service";
+import {
+  assertRepPRegistrationContext,
+  assertRepPReplayMatches,
+  repPRequestFingerprint,
+  RepPRegistrationError,
+} from "@/rep-p/registration-core";
+
+export type RegisterRepPPointInput = {
+  employeeId: string;
+  collectorId: string;
+  eventType: "CLOCK_IN" | "CLOCK_OUT";
+  idempotencyKey: string;
+  locationValidationId?: string;
+  biometricValidationId?: string;
+  registrationAttemptId?: string;
+  contingencyEventId?: string;
+  trustedOccurredAt?: Date;
+  contingency?: boolean;
+};
+
 class ConcurrentRepPReplay extends Error {}
-function registrationResult(entry: typeof timeEntries.$inferSelect, eventType: RegisterRepPPointInput["eventType"], replay: boolean) { return { id: entry.id, employeeId: entry.employeeId, establishmentId: entry.establishmentId!, registrarId: entry.registrarId!, collectorId: entry.collectorId!, nsr: entry.nsr!, recordedAt: entry.occurredAt, eventType, replay }; }
-export async function registerRepPPoint(input: RegisterRepPPointInput, clock: OfficialClock = systemOfficialClock) {
-  const requestFingerprint = repPRequestFingerprint(input.employeeId, input.eventType); const [existing] = await db.select().from(timeEntries).where(and(eq(timeEntries.collectorId, input.collectorId), eq(timeEntries.idempotencyKey, input.idempotencyKey))).limit(1); if (existing) { assertRepPReplayMatches(existing.metadata, requestFingerprint); return registrationResult(existing, input.eventType, true); }
-  const [context] = await db.select({ collectorId: repCollectors.id, collectorStatus: repCollectors.status, deviceIdentifier: repCollectors.deviceIdentifier, registrarId: repRegistrars.id, registrarStatus: repRegistrars.status, registrarMode: repRegistrars.mode, establishmentId: establishments.id, establishmentActive: establishments.isActive, timezone: establishments.timezone, registrationEnabled: repConfigurations.registrationEnabled }).from(repCollectors).innerJoin(repRegistrars, eq(repRegistrars.id, repCollectors.registrarId)).innerJoin(establishments, eq(establishments.id, repRegistrars.establishmentId)).innerJoin(repConfigurations, eq(repConfigurations.registrarId, repRegistrars.id)).where(eq(repCollectors.id, input.collectorId)).limit(1); if (!context) throw new RepPRegistrationError("COLLECTOR_NOT_FOUND", "Coletor não encontrado."); const [employee] = await db.select({ id: employees.id, isActive: employees.isActive, status: employees.status }).from(employees).where(eq(employees.id, input.employeeId)).limit(1); if (!employee) throw new RepPRegistrationError("EMPLOYEE_NOT_FOUND", "Funcionário não encontrado."); assertRepPRegistrationContext({ ...context, employeeActive: employee.isActive, employeeStatus: employee.status }); const occurredAt = input.trustedOccurredAt ?? officialRecordedAt(clock);
-  try { return await db.transaction(async (tx) => { const nsr = await nextRepPNsr(tx, context.establishmentId); await recordRepPEvent(tx, { eventType: "REP_P_NSR_ASSIGNED", outcome: "SUCCESS", registrarId: context.registrarId, collectorId: context.collectorId, employeeId: employee.id, nsr, occurredAt }); const [entry] = await tx.insert(timeEntries).values({ employeeId: employee.id, occurredAt, source: "REP_P", externalId: `rep-p:${context.registrarId}:${nsr}`, deviceIdentifier: context.deviceIdentifier, establishmentId: context.establishmentId, registrarId: context.registrarId, collectorId: context.collectorId, nsr, idempotencyKey: input.idempotencyKey, locationValidationId: input.locationValidationId, biometricValidationId: input.biometricValidationId, registrationAttemptId: input.registrationAttemptId, contingencyEventId: input.contingencyEventId, metadata: { eventType: input.eventType, timezone: context.timezone, original: true, authenticationMethod: input.contingency ? "CONTINGENCY" : "BIOMETRIC", capturedOffline: Boolean(input.trustedOccurredAt), requestFingerprint } }).onConflictDoNothing({ target: [timeEntries.collectorId, timeEntries.idempotencyKey] }).returning(); if (!entry) throw new ConcurrentRepPReplay(); await recordRepPEvent(tx, { eventType: "REP_P_ENTRY_CREATED", outcome: "SUCCESS", registrarId: context.registrarId, collectorId: context.collectorId, employeeId: employee.id, nsr, metadata: { timeEntryId: entry.id, eventType: input.eventType, contingencyEventId: input.contingencyEventId }, occurredAt }); return registrationResult(entry, input.eventType, false); }); }
-  catch (error) { if (!(error instanceof ConcurrentRepPReplay)) throw error; const [replayed] = await db.select().from(timeEntries).where(and(eq(timeEntries.collectorId, input.collectorId), eq(timeEntries.idempotencyKey, input.idempotencyKey))).limit(1); if (!replayed) throw new Error("Reenvio concorrente não localizado."); assertRepPReplayMatches(replayed.metadata, requestFingerprint); return registrationResult(replayed, input.eventType, true); }
+
+function registrationResult(
+  entry: typeof timeEntries.$inferSelect,
+  eventType: RegisterRepPPointInput["eventType"],
+  replay: boolean,
+) {
+  return {
+    id: entry.id,
+    employeeId: entry.employeeId,
+    establishmentId: entry.establishmentId!,
+    registrarId: entry.registrarId!,
+    collectorId: entry.collectorId!,
+    nsr: entry.nsr!,
+    recordedAt: entry.occurredAt,
+    eventType,
+    replay,
+  };
+}
+
+type RegistrationResult = ReturnType<typeof registrationResult>;
+
+async function attachReceipt(result: RegistrationResult) {
+  try {
+    const receipt = await generatePointReceipt(result.id);
+
+    if (!receipt) {
+      return { ...result, receipt: undefined };
+    }
+
+    return {
+      ...result,
+      receipt: {
+        id: receipt.id,
+        receiptNumber: receipt.receiptNumber,
+        status: receipt.status,
+      },
+    };
+  } catch {
+    // O comprovante é um efeito posterior ao registro oficial. Uma falha
+    // inesperada nunca pode desfazer ou ocultar a marcação já persistida.
+    return { ...result, receipt: undefined };
+  }
+}
+
+export async function registerRepPPoint(
+  input: RegisterRepPPointInput,
+  clock: OfficialClock = systemOfficialClock,
+) {
+  const requestFingerprint = repPRequestFingerprint(input.employeeId, input.eventType);
+  const [existing] = await db
+    .select()
+    .from(timeEntries)
+    .where(
+      and(
+        eq(timeEntries.collectorId, input.collectorId),
+        eq(timeEntries.idempotencyKey, input.idempotencyKey),
+      ),
+    )
+    .limit(1);
+
+  if (existing) {
+    assertRepPReplayMatches(existing.metadata, requestFingerprint);
+    return attachReceipt(registrationResult(existing, input.eventType, true));
+  }
+
+  const [context] = await db
+    .select({
+      collectorId: repCollectors.id,
+      collectorStatus: repCollectors.status,
+      deviceIdentifier: repCollectors.deviceIdentifier,
+      registrarId: repRegistrars.id,
+      registrarStatus: repRegistrars.status,
+      registrarMode: repRegistrars.mode,
+      establishmentId: establishments.id,
+      establishmentActive: establishments.isActive,
+      timezone: establishments.timezone,
+      registrationEnabled: repConfigurations.registrationEnabled,
+    })
+    .from(repCollectors)
+    .innerJoin(repRegistrars, eq(repRegistrars.id, repCollectors.registrarId))
+    .innerJoin(establishments, eq(establishments.id, repRegistrars.establishmentId))
+    .innerJoin(repConfigurations, eq(repConfigurations.registrarId, repRegistrars.id))
+    .where(eq(repCollectors.id, input.collectorId))
+    .limit(1);
+
+  if (!context) {
+    throw new RepPRegistrationError("COLLECTOR_NOT_FOUND", "Coletor não encontrado.");
+  }
+
+  const [employee] = await db
+    .select({ id: employees.id, isActive: employees.isActive, status: employees.status })
+    .from(employees)
+    .where(eq(employees.id, input.employeeId))
+    .limit(1);
+
+  if (!employee) {
+    throw new RepPRegistrationError("EMPLOYEE_NOT_FOUND", "Funcionário não encontrado.");
+  }
+
+  assertRepPRegistrationContext({
+    ...context,
+    employeeActive: employee.isActive,
+    employeeStatus: employee.status,
+  });
+
+  const occurredAt = input.trustedOccurredAt ?? officialRecordedAt(clock);
+  let result: RegistrationResult;
+
+  try {
+    result = await db.transaction(async (tx) => {
+      const nsr = await nextRepPNsr(tx, context.establishmentId);
+      await recordRepPEvent(tx, {
+        eventType: "REP_P_NSR_ASSIGNED",
+        outcome: "SUCCESS",
+        registrarId: context.registrarId,
+        collectorId: context.collectorId,
+        employeeId: employee.id,
+        nsr,
+        occurredAt,
+      });
+
+      const [entry] = await tx
+        .insert(timeEntries)
+        .values({
+          employeeId: employee.id,
+          occurredAt,
+          source: "REP_P",
+          externalId: `rep-p:${context.registrarId}:${nsr}`,
+          deviceIdentifier: context.deviceIdentifier,
+          establishmentId: context.establishmentId,
+          registrarId: context.registrarId,
+          collectorId: context.collectorId,
+          nsr,
+          idempotencyKey: input.idempotencyKey,
+          locationValidationId: input.locationValidationId,
+          biometricValidationId: input.biometricValidationId,
+          registrationAttemptId: input.registrationAttemptId,
+          contingencyEventId: input.contingencyEventId,
+          metadata: {
+            eventType: input.eventType,
+            timezone: context.timezone,
+            original: true,
+            authenticationMethod: input.contingency ? "CONTINGENCY" : "BIOMETRIC",
+            capturedOffline: Boolean(input.trustedOccurredAt),
+            requestFingerprint,
+          },
+        })
+        .onConflictDoNothing({
+          target: [timeEntries.collectorId, timeEntries.idempotencyKey],
+        })
+        .returning();
+
+      if (!entry) throw new ConcurrentRepPReplay();
+
+      await recordRepPEvent(tx, {
+        eventType: "REP_P_ENTRY_CREATED",
+        outcome: "SUCCESS",
+        registrarId: context.registrarId,
+        collectorId: context.collectorId,
+        employeeId: employee.id,
+        nsr,
+        metadata: {
+          timeEntryId: entry.id,
+          eventType: input.eventType,
+          contingencyEventId: input.contingencyEventId,
+        },
+        occurredAt,
+      });
+
+      return registrationResult(entry, input.eventType, false);
+    });
+  } catch (error) {
+    if (!(error instanceof ConcurrentRepPReplay)) throw error;
+
+    const [replayed] = await db
+      .select()
+      .from(timeEntries)
+      .where(
+        and(
+          eq(timeEntries.collectorId, input.collectorId),
+          eq(timeEntries.idempotencyKey, input.idempotencyKey),
+        ),
+      )
+      .limit(1);
+
+    if (!replayed) throw new Error("Reenvio concorrente não localizado.");
+    assertRepPReplayMatches(replayed.metadata, requestFingerprint);
+    result = registrationResult(replayed, input.eventType, true);
+  }
+
+  return attachReceipt(result);
 }

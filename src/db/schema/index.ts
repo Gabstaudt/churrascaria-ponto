@@ -20,3 +20,4 @@ export * from "./rep";
 export * from "./legal-settings";
 export * from "./rep-p";
 export * from "./biometrics";
+export * from "./point-receipts";

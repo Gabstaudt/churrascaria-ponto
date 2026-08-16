@@ -1,0 +1,6 @@
+import { createHash } from "node:crypto";
+import { describe, expect, it } from "vitest";
+import { renderReceiptPdf } from "./point-receipt-pdf.service";
+import { renderPointReceipt } from "../templates/point-receipt.renderer";
+const data = { receiptId: "id", receiptNumber: "REC-1", employeeName: "João da Silva", employeeRegistration: "10", employeeDocumentMasked: "***.***.***-10", employerName: "Churrascaria Marituba", employerDocument: "16.912.959/0001-33", establishmentName: "Churrascaria Marituba", registrarIdentifier: "REP-P-1", recordedAt: new Date("2026-08-15T13:58:37Z"), timezone: "America/Belem", nsr: "000018293", verificationToken: "opaque" };
+describe("PDF do comprovante", () => { it("é determinístico e usa o timezone oficial", () => { const document = renderPointReceipt(data); expect(document.sections.find((item) => item.label === "Data e hora")?.value).toContain("10:58:37"); const a = renderReceiptPdf(document); const b = renderReceiptPdf(document); expect(Buffer.from(a).subarray(0, 8).toString()).toBe("%PDF-1.4"); expect(createHash("sha256").update(a).digest("hex")).toBe(createHash("sha256").update(b).digest("hex")); }); it("não contém biometria nem coordenadas", () => { const text = Buffer.from(renderReceiptPdf(renderPointReceipt(data))).toString(); expect(text).not.toMatch(/liveness|similarity|latitude|longitude|embedding/i); }); });

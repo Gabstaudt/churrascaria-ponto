@@ -18,6 +18,7 @@ export const afdGenerations = pgTable("afd_generations", {
   fileName: varchar("file_name", { length: 250 }),
   fileKey: varchar("file_key", { length: 500 }),
   fileHash: varchar("file_hash", { length: 64 }),
+  signatureHash: varchar("signature_hash", { length: 64 }),
   signatureStatus: varchar("signature_status", { length: 20 }).notNull().default("PENDING"),
   signatureFileKey: varchar("signature_file_key", { length: 500 }),
   certificateIdentifier: varchar("certificate_identifier", { length: 200 }),

@@ -21,3 +21,4 @@ export * from "./legal-settings";
 export * from "./rep-p";
 export * from "./biometrics";
 export * from "./point-receipts";
+export * from "./afd-generations";

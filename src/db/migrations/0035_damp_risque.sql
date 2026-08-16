@@ -1,0 +1,1 @@
+ALTER TABLE "rep_registrars" ADD COLUMN "inpi_registration" varchar(17);

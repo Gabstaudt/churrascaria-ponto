@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Archive, BarChart3, CalendarCheck2, CalendarDays, CalendarRange, FileCheck2, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, UsersRound } from "lucide-react";
+import { AlertTriangle, Archive, BarChart3, CalendarCheck2, CalendarDays, CalendarRange, FileCheck2, FileSignature, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -19,6 +19,9 @@ const links = [
   { href: "/admin/contingencias", label: "Contingências", icon: AlertTriangle, exact: false, desktopOnly: true },
   { href: "/admin/comprovantes", label: "Comprovantes", icon: FileCheck2, exact: false, desktopOnly: true },
   { href: "/admin/rep-p/afd", label: "AFD", icon: Archive, exact: false, desktopOnly: true },
+  { href: "/admin/rep-p/aej", label: "AEJ", icon: FileSignature, exact: false, desktopOnly: true },
+  { href: "/admin/rep-p/certificado", label: "Certificado", icon: KeyRound, exact: false, desktopOnly: true },
+  { href: "/admin/rep-p/assinaturas", label: "Assinaturas", icon: FileCheck2, exact: false, desktopOnly: true },
   { href: "/admin/relatorios", label: "Relatórios", icon: BarChart3, exact: false, desktopOnly: true },
 ];
 

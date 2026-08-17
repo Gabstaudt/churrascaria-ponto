@@ -28,7 +28,8 @@
     "rep-p:provision": "tsx scripts/provision-rep-p.ts",
     "receipts:recover": "tsx scripts/recover-point-receipts.ts",
     "receipts:reconcile": "tsx scripts/reconcile-point-receipts.ts",
-    "afd:validate": "tsx scripts/validate-afd.ts"
+    "afd:validate": "tsx scripts/validate-afd.ts",
+    "biometrics:purge": "tsx scripts/purge-biometric-data.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1109.0",

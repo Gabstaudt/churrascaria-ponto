@@ -28,3 +28,10 @@ documentos médicos, senhas, tokens ou URLs assinadas em mensagens de suporte.
 Registre causa, impacto, linha do tempo, correção, validação e ação preventiva.
 Incidentes envolvendo dados pessoais devem ser encaminhados ao responsável LGPD
 para avaliação das obrigações de notificação.
+
+## Incidentes biométricos
+
+Para vazamento de template, comprometimento de chave de criptografia, acesso
+indevido ao cadastro biométrico ou exposição em logs, siga os cenários
+específicos em `docs/privacy/INCIDENT_RESPONSE_BIOMETRICS.md` além do fluxo
+geral acima.

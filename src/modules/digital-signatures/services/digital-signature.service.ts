@@ -6,11 +6,12 @@ import { certificateMetadata, signatureOperations } from "@/db/schema";
 import { getPrivateObjectBytes, putPrivateObject } from "@/services/object-storage.service";
 import { OpenSslDigitalSignatureProvider } from "../providers/openssl-digital-signature.provider";
 import { assertSignatureMapping, SIGNATURE_IMPLEMENTATION_VERSION, type DigitalSignatureProvider, type DocumentType } from "../types";
+import { signatureRetryDelayMs } from "./signature-retry-policy";
 
 const SOFTWARE_VERSION = process.env.NEXT_PUBLIC_TERMINAL_VERSION ?? "0.1.0";
 const STALE_AFTER_MS = 5 * 60_000;
 function hash(bytes: Uint8Array) { return createHash("sha256").update(bytes).digest("hex"); }
-function retryAt(count: number) { return new Date(Date.now() + [60_000, 300_000, 900_000, 3_600_000, 21_600_000][Math.min(count, 4)]); }
+function retryAt(count: number) { return new Date(Date.now() + signatureRetryDelayMs(count)); }
 
 export class DigitalSignatureService {
   constructor(private readonly provider: DigitalSignatureProvider = new OpenSslDigitalSignatureProvider()) {}

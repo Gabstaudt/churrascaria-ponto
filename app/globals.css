@@ -965,7 +965,7 @@ a { color: inherit; text-decoration: none; }
   .portal-header nav a { flex-direction: column; gap: .2rem; font-size: .66rem; }
 }
 .access-page { width: 100%; max-width: 1180px; margin-inline: auto; }
-.access-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.2rem; }
+.access-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; margin-top: 1.2rem; }
 .access-grid .data-panel { margin-top: 0; overflow: hidden; }
 .access-grid .data-panel > header, .access-list > header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.15rem; border-bottom: 1px solid var(--line); }
 .access-grid h2, .access-list h2 { margin: 0; font-size: 1rem; }

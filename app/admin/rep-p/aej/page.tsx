@@ -23,21 +23,19 @@ export default async function AejPage({ searchParams }: { searchParams: Promise<
         </div>
       </header>
       {query.error ? <p className="portal-feedback error">A operação não pôde ser concluída. Verifique se o período está fechado, se há funcionários no intervalo e se os dados jurídicos estão configurados.</p> : null}
-      <div className="afd-operation-grid">
-        <section className="data-panel afd-form-panel">
-          <header><div><h2>Nova geração</h2><p>Somente períodos fechados podem gerar AEJ oficial.</p></div></header>
-          <form action={generateAejAction} className="portal-form">
-            <label className="wide">Competência
-              <select name="closingPeriodId" required>
-                <option value="">Selecione</option>
-                {closedPeriods.map((period) => <option value={period.id} key={period.id}>{period.referenceMonth} · {period.startDate} a {period.endDate}</option>)}
-              </select>
-            </label>
-            <button className="primary-button"><FileArchive size={16} /> Gerar AEJ</button>
-          </form>
-          {!closedPeriods.length ? <p className="portal-feedback">Nenhuma competência fechada disponível.</p> : null}
-        </section>
-      </div>
+      <section className="data-panel afd-form-panel single-form-panel">
+        <header><div><h2>Nova geração</h2><p>Somente períodos fechados podem gerar AEJ oficial.</p></div></header>
+        <form action={generateAejAction} className="portal-form">
+          <label className="wide">Competência
+            <select name="closingPeriodId" required>
+              <option value="">Selecione</option>
+              {closedPeriods.map((period) => <option value={period.id} key={period.id}>{period.referenceMonth} · {period.startDate} a {period.endDate}</option>)}
+            </select>
+          </label>
+          <button className="primary-button"><FileArchive size={16} /> Gerar AEJ</button>
+        </form>
+        {!closedPeriods.length ? <p className="portal-feedback">Nenhuma competência fechada disponível.</p> : null}
+      </section>
       <section className="data-panel">
         <header><div><h2>Histórico de gerações</h2><p>Cada revisão preserva arquivo, hash e assinatura anteriores; reaberturas geram uma nova revisão.</p></div><span>{rows.length}</span></header>
         <div className="afd-list">

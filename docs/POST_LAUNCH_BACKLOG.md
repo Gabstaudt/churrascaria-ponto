@@ -13,7 +13,10 @@
 
 1. Automatizar métricas e alertas externos de disponibilidade/latência.
 2. Ampliar cenários ponta a ponta autenticados em homologação.
-3. Formalizar retenção LGPD e rotina de atendimento ao titular.
+3. Formalizar retenção LGPD do restante do sistema (fora de biometria, já
+   coberta em `docs/privacy/BIOMETRIC_RETENTION_POLICY.md`) e a rotina de
+   atendimento ao titular; obter validação jurídica formal dos prazos
+   biométricos definidos na Sprint 33 e do RIPD em `BIOMETRIC_RISK_ASSESSMENT.md`.
 4. Automatizar relatório diário de conciliação e saúde do REP.
 
 ## P2 — evolução

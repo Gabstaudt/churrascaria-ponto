@@ -10,6 +10,7 @@ import { mapEmployeeConflict } from "./employee-errors";
 import { isEmployeeActiveForStatus, resolveEmployeeActivation } from "./employee-status";
 import { recordAudit } from "./audit.service";
 import { redactAuditPayload } from "./audit-redaction";
+import { revokeEmployeeBiometricInTransaction } from "@/modules/biometrics/services/biometric.service";
 
 const DEFAULT_PAGE_SIZE = 10;
 const MAX_PAGE_SIZE = 50;
@@ -143,6 +144,22 @@ export async function updateEmployee(id: string, input: EmployeeUpdateInput, per
         before: auditSnapshot(current),
         after: auditSnapshot(updated),
       });
+
+      if (current.status !== "TERMINATED" && updated.status === "TERMINATED") {
+        const profile = await revokeEmployeeBiometricInTransaction(tx, id);
+        if (profile) {
+          await recordAudit(tx, {
+            action: "BIOMETRIC_REVOKED",
+            entity: "EMPLOYEE_BIOMETRIC_PROFILE",
+            entityId: profile.id,
+            performedBy,
+            before: { employeeId: id, status: "ACTIVE" },
+            after: { employeeId: id, status: "REVOKED" },
+            reason: "Desligamento do funcionário",
+          });
+        }
+      }
+
       return updated;
     });
   } catch (error) {

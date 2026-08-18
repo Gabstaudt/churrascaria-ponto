@@ -1,4 +1,5 @@
-import { Clock3, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getSession } from "@/auth/session";
 import { LoginForm } from "@/components/auth/login-form";
@@ -11,7 +12,7 @@ export default async function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-intro">
-        <div className="brand-mark" aria-hidden="true"><Clock3 size={28} /></div>
+        <div className="brand-mark" aria-hidden="true"><Image src="/logo/favico.ico" alt="" width={784} height={569} priority /></div>
         <p className="eyebrow">Churrascaria Marituba</p>
         <h1>Gestão de jornada com segurança e clareza.</h1>
         <p>Acesse o ambiente administrativo para acompanhar funcionários, jornadas e registros de ponto.</p>

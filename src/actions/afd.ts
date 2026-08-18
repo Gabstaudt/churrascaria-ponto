@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { afdGenerations, repRegistrars } from "@/db/schema";
 import { generateOfficialAfd, previewAfd } from "@/modules/afd/services/afd-generation.service";
 import { requireAfdPermission } from "@/modules/afd/services/afd-permission.service";
+import { signAfdGeneration } from "@/modules/digital-signatures/services/afd-signature.service";
 
 function input(formData: FormData) { const registrarId = String(formData.get("registrarId") ?? ""); const startDate = String(formData.get("startDate") ?? ""); const endDate = String(formData.get("endDate") ?? ""); if (!registrarId || !/^\d{4}-\d{2}-\d{2}$/.test(startDate) || !/^\d{4}-\d{2}-\d{2}$/.test(endDate) || startDate > endDate) redirect("/admin/rep-p/afd?error=invalid-period"); return { registrarId, startDate, endDate }; }
 
@@ -31,3 +32,5 @@ export async function retryAfdGenerationAction(id: string) {
 export async function configureRegistrarInpiAction(formData: FormData) {
   await requireAfdPermission("AFD_GENERATE"); const registrarId = String(formData.get("registrarId") ?? ""); const registration = String(formData.get("inpiRegistration") ?? "").replace(/\D/g, ""); if (!registrarId || !/^\d{1,17}$/.test(registration)) redirect("/admin/rep-p/afd?error=invalid-inpi"); await db.update(repRegistrars).set({ inpiRegistration: registration, updatedAt: new Date() }).where(eq(repRegistrars.id, registrarId)); revalidatePath("/admin/rep-p/afd"); redirect("/admin/rep-p/afd?saved=inpi");
 }
+
+export async function signAfdAction(id: string) { const session = await requireAfdPermission("AFD_GENERATE"); try { await signAfdGeneration(id, session.user.id); revalidatePath(`/admin/rep-p/afd/${id}`); revalidatePath("/admin/rep-p/afd"); } catch { redirect(`/admin/rep-p/afd/${id}?error=signature`); } }

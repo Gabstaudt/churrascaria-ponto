@@ -1,4 +1,4 @@
 export const POINT_RECEIPT_FORMAT_VERSION = "REP_P_RECEIPT_V1";
 export type PointReceiptData = { receiptId: string; receiptNumber: string; employeeName: string; employeeRegistration: string; employeeDocumentMasked: string; employerName: string; employerDocument: string; establishmentName: string; registrarIdentifier: string; recordedAt: Date; timezone: string; nsr: string; verificationToken: string };
 export type PointReceiptDocument = { title: string; sections: Array<{ label: string; value: string }>; verificationPath: string; footer: string };
-export type SignedPdfResult = { bytes: Uint8Array; status: "NOT_REQUIRED" | "SIGNED"; provider?: string; certificateIdentifier?: string; certificateSubject?: string; certificateValidFrom?: Date; certificateValidUntil?: Date; signedAt?: Date };
+export type SignedPdfResult = { bytes: Uint8Array; status: "NOT_REQUIRED" | "SIGNED"; fileKey?: string; unsignedHash?: string; provider?: string; certificateIdentifier?: string; certificateSubject?: string; certificateValidFrom?: Date; certificateValidUntil?: Date; signedAt?: Date };

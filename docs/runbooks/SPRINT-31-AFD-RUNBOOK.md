@@ -6,6 +6,8 @@
 4. Execute **Validar AFD** para o período.
 5. Corrija erros legais ou de NSR na fonte; nunca edite o arquivo.
 6. Execute **Gerar AFD**. O arquivo ficará privado com assinatura pendente.
-7. Após a Sprint 32, assine com CAdES destacado e libere o download oficial.
+7. Em **Administração → AFD**, na tela de detalhe, execute **Assinar com CAdES**.
+8. Baixe o AFD e a assinatura `.p7s` (`Baixar AFD` / `Baixar .p7s`); ambos ficam
+   disponíveis somente depois que a assinatura é validada (status `SIGNED`).
 
 Alertas críticos: `MISSING_NSR`, `DUPLICATE_NSR`, `AFD_RECONCILIATION_FAILED`, falha de geração e divergência de hash. A restauração exige banco e Object Storage; valide sempre o hash após recuperar o arquivo.

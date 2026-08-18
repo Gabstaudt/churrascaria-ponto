@@ -22,3 +22,5 @@ export * from "./rep-p";
 export * from "./biometrics";
 export * from "./point-receipts";
 export * from "./afd-generations";
+export * from "./digital-signatures";
+export * from "./official-documents";

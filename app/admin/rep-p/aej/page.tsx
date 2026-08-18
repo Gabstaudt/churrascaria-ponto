@@ -14,7 +14,7 @@ export default async function AejPage({ searchParams }: { searchParams: Promise<
   const [rows, periods] = await Promise.all([listAejGenerations(), listClosingPeriods()]);
   const closedPeriods = periods.filter((period) => period.status === "CLOSED");
   return (
-    <main className="page-content afd-page">
+    <main className="dashboard-page afd-page">
       <header className="page-heading">
         <div>
           <p className="eyebrow">PTRP · documento regulatório</p>
@@ -24,7 +24,7 @@ export default async function AejPage({ searchParams }: { searchParams: Promise<
       </header>
       {query.error ? <p className="portal-feedback error">A operação não pôde ser concluída. Verifique se o período está fechado, se há funcionários no intervalo e se os dados jurídicos estão configurados.</p> : null}
       <div className="afd-operation-grid">
-        <section className="content-panel afd-form-panel">
+        <section className="data-panel afd-form-panel">
           <header><div><h2>Nova geração</h2><p>Somente períodos fechados podem gerar AEJ oficial.</p></div></header>
           <form action={generateAejAction} className="portal-form">
             <label className="wide">Competência
@@ -38,7 +38,7 @@ export default async function AejPage({ searchParams }: { searchParams: Promise<
           {!closedPeriods.length ? <p className="portal-feedback">Nenhuma competência fechada disponível.</p> : null}
         </section>
       </div>
-      <section className="content-panel">
+      <section className="data-panel">
         <header><div><h2>Histórico de gerações</h2><p>Cada revisão preserva arquivo, hash e assinatura anteriores; reaberturas geram uma nova revisão.</p></div><span>{rows.length}</span></header>
         <div className="afd-list">
           {rows.map(({ generation, establishmentName, referenceMonth }) => (

@@ -12,7 +12,7 @@ export default async function CertificatePage({ searchParams }: { searchParams: 
   const status = await new CertificateService().status();
   const loaded = "serialNumber" in status;
   return (
-    <main className="page-content afd-page">
+    <main className="dashboard-page afd-page">
       <header className="page-heading">
         <div>
           <p className="eyebrow">Conformidade · assinatura digital</p>
@@ -41,7 +41,7 @@ export default async function CertificatePage({ searchParams }: { searchParams: 
         </section>
       ) : <p className="portal-feedback">O certificado configurado no ambiente não pôde ser carregado. Verifique as variáveis <code>CERTIFICATE_PFX_PATH</code> e <code>CERTIFICATE_PFX_PASSWORD</code>.</p>}
       {loaded && status.databaseStatus === "ACTIVE" ? (
-        <section className="content-panel afd-form-panel">
+        <section className="data-panel afd-form-panel">
           <header><div><h2>Desativar certificado</h2><p>Interrompe imediatamente novas assinaturas com este certificado. Use em caso de suspeita de comprometimento.</p></div></header>
           <form action={disableCertificateAction.bind(null, status.serialNumber)} className="portal-form">
             <label className="wide">Motivo<input name="reason" required maxLength={300} /></label>

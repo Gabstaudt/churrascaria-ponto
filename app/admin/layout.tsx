@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="admin-shell">
       <aside className="sidebar">
-        <Link className="sidebar-brand" href="/admin"><span className="brand-mark small" aria-hidden="true"><Image src="/logo/favico.ico" alt="" width={784} height={569} /></span><span><strong>Churrascaria</strong><small>Gestão de ponto</small></span></Link>
+        <Link className="sidebar-brand" href="/admin"><span className="brand-mark small" aria-hidden="true"><Image src="/logo/favico.ico" alt="" width={784} height={569} /></span><span><strong>OnTheDot</strong><small>Gestão de ponto</small></span></Link>
         <AdminNav />
         <form action={logoutAction} className="logout-form"><button className="nav-link logout-button" type="submit"><LogOut size={19} /> Sair</button></form>
       </aside>

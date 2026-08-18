@@ -4,7 +4,7 @@ import { VersionWatcher } from "@/components/terminal/version-watcher";
 
 export const metadata: Metadata = {
   title: "Terminal de ponto | UpTime",
-  description: "Terminal oficial de registro de ponto da Churrascaria Marituba.",
+  description: "Terminal oficial de registro de ponto da OnTheDot.",
   robots: { index: false, follow: false, noarchive: true },
 };
 

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Churrascaria Ponto",
-  description: "Gestão de jornada e ponto eletrônico da Churrascaria Marituba",
+  title: "OnTheDot",
+  description: "Gestão de jornada e ponto eletrônico da OnTheDot",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

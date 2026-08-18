@@ -16,7 +16,7 @@ if (!authSecret || authSecret.length < 32) {
 }
 
 export const auth = betterAuth({
-  appName: "Churrascaria Ponto",
+  appName: "OnTheDot",
   baseURL: process.env.BETTER_AUTH_URL,
   secret: authSecret,
   database: drizzleAdapter(db, {

@@ -13,7 +13,7 @@ export default async function LoginPage() {
     <main className="auth-page">
       <section className="auth-intro">
         <div className="brand-mark" aria-hidden="true"><Image src="/logo/favico.ico" alt="" width={784} height={569} priority /></div>
-        <p className="eyebrow">Churrascaria Marituba</p>
+        <p className="eyebrow">OnTheDot</p>
         <h1>Gestão de jornada com segurança e clareza.</h1>
         <p>Acesse o ambiente administrativo para acompanhar funcionários, jornadas e registros de ponto.</p>
         <div className="security-note"><ShieldCheck aria-hidden="true" size={20} /><span>Ambiente restrito a usuários autorizados</span></div>

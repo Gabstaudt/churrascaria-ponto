@@ -53,6 +53,10 @@ def enroll(req:EnrollRequest,x_internal_token:str|None=Header(None)):
 def identify(req:IdentifyRequest,x_internal_token:str|None=Header(None)):
     authorize(x_internal_token); started=time.perf_counter(); frame=image(req.imageBase64); _,detection,live,liveness_score=analyze(frame); liveness={"status":"PASSED" if live else "FAILED","score":liveness_score,"method":"PASSIVE","riskFlags":[] if live else ["PHOTO_ATTACK_SUSPECTED"],"durationMs":detection["durationMs"]}
     if detection["quality"]!="GOOD" or not live:return {"decision":"NO_MATCH","detection":detection,"liveness":liveness,"provider":"local-opencv","algorithmVersion":VERSION,"durationMs":round((time.perf_counter()-started)*1000)}
-    probe=embedding(frame); ranked=sorted(((cosine(probe,c.template),c.employeeId) for c in req.candidates),reverse=True); best=ranked[0] if ranked else (None,None); second=ranked[1][0] if len(ranked)>1 else None
+    probe=embedding(frame); best_per_employee={}
+    for c in req.candidates:
+        score=cosine(probe,c.template)
+        if c.employeeId not in best_per_employee or score>best_per_employee[c.employeeId]: best_per_employee[c.employeeId]=score
+    ranked=sorted(((score,employeeId) for employeeId,score in best_per_employee.items()),reverse=True); best=ranked[0] if ranked else (None,None); second=ranked[1][0] if len(ranked)>1 else None
     decision="NO_MATCH" if best[0] is None or best[0]<req.policy.minimumSimilarityThreshold else "AMBIGUOUS" if second is not None and best[0]-second<req.policy.minimumScoreGap else "MATCH"
     return {"employeeId":best[1] if decision=="MATCH" else None,"score":best[0],"secondBestScore":second,"decision":decision,"detection":detection,"liveness":liveness,"provider":"local-opencv","algorithmVersion":VERSION,"durationMs":round((time.perf_counter()-started)*1000)}

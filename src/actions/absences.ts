@@ -10,6 +10,7 @@ export async function decideAbsenceAction(_state: AbsenceFormState, formData: Fo
   const session = await requireAdmin();
   const parsed = absenceDecisionSchema.safeParse({ employeeId: formData.get("employeeId"), date: formData.get("date"), decision: formData.get("decision"), reason: formData.get("reason") });
   if (!parsed.success) return { message: "Revise os dados da decisão.", errors: parsed.error.issues.map((issue) => issue.message) };
-  try { await decideAbsence(parsed.data, session.user.id); redirect(`/admin/faltas?employeeId=${parsed.data.employeeId}&date=${parsed.data.date}&saved=1`); }
+  try { await decideAbsence(parsed.data, session.user.id); }
   catch { return { message: "Não foi possível registrar a decisão." }; }
+  redirect(`/admin/faltas?employeeId=${parsed.data.employeeId}&date=${parsed.data.date}&saved=1`);
 }

@@ -14,9 +14,9 @@ export async function saveScheduleExceptionAction(_state: ExceptionFormState, fo
   if (!parsed.success) return { message: "Revise os dados do ajuste.", errors: parsed.error.issues.map((issue) => issue.message) };
   try {
     await saveScheduleException(parsed.data, session.user.id);
-    redirect(`/admin/escalas?date=${parsed.data.date}&view=day&saved=1`);
   } catch (error) {
     console.error("Falha ao salvar exceção da escala", { error: error instanceof Error ? error.message : "unknown", performedBy: session.user.id });
     return { message: "Não foi possível salvar o ajuste excepcional." };
   }
+  redirect(`/admin/escalas?date=${parsed.data.date}&view=day&saved=1`);
 }

@@ -29,6 +29,6 @@ export async function requireEmployeePortal() {
 
 export async function requireManagerPortal() {
   const session = await requireSession();
-  if (session.user.role !== "MANAGER") redirect("/acesso-negado");
+  if (session.user.role !== "MANAGER" && session.user.role !== "ADMIN") redirect("/acesso-negado");
   return session;
 }

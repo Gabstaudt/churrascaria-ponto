@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Archive, BarChart3, CalendarCheck2, CalendarDays, CalendarRange, FileCheck2, FileKey, FileSignature, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, Stamp, UsersRound } from "lucide-react";
+import { AlertTriangle, Archive, BarChart3, CalendarCheck2, CalendarDays, CalendarRange, ClipboardCheck, FileCheck2, FileKey, FileSignature, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, Stamp, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,6 +21,7 @@ const sections = [
       { href: "/admin/banco-horas", label: "Banco de horas", icon: Scale, exact: false, desktopOnly: true },
       { href: "/admin/fechamentos", label: "Fechamentos", icon: CalendarCheck2, exact: false, desktopOnly: true },
       { href: "/admin/acessos", label: "Acessos", icon: KeyRound, exact: false, desktopOnly: true },
+      { href: "/gestao/solicitacoes", label: "Solicitações", icon: ClipboardCheck, exact: false, desktopOnly: true },
     ],
   },
   {

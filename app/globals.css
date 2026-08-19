@@ -542,6 +542,7 @@ a { color: inherit; text-decoration: none; }
 .employee-profile-empty { padding: 2rem 1.2rem; color: var(--muted); font-size: .84rem; text-align: center; }
 .employee-notes-text { margin: 0; padding: 1.2rem; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .88rem; line-height: 1.6; }
 .notification-actions { display: flex; flex: none; align-items: center; gap: .6rem; font-size: .78rem; color: var(--muted); }
+.notification-actions .secondary-button { min-height: 1.85rem; padding: 0 .6rem; gap: .3rem; font-size: .72rem; border-radius: .45rem; }
 .notification-open { display: grid; min-width: 0; gap: .2rem; color: inherit; text-decoration: none; }
 .notification-open:hover strong { text-decoration: underline; }
 .employee-profile-documents { display: flex; min-height: 13rem; align-items: center; justify-content: center; flex-direction: column; padding: 1.2rem; color: var(--muted); text-align: center; }

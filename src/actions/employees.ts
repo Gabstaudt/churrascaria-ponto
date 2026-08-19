@@ -7,7 +7,7 @@ import { EmployeeConflictError } from "@/services/employee-errors";
 import { createEmployee, setEmployeeActive, updateEmployee } from "@/services/employee.service";
 import { employeeCreateSchema, employeeIdSchema, employeeUpdateSchema } from "@/validations/employee";
 
-export type EmployeeField = "fullName" | "cpf" | "phone" | "position" | "registrationNumber" | "admissionDate" | "status" | "workCardNumber" | "emergencyContactName" | "emergencyContactRelationship" | "emergencyContactPhone";
+export type EmployeeField = "fullName" | "cpf" | "phone" | "position" | "registrationNumber" | "admissionDate" | "status" | "workCardNumber" | "emergencyContactName" | "emergencyContactRelationship" | "emergencyContactPhone" | "notes";
 
 export type EmployeeFormState = {
   message?: string;
@@ -30,6 +30,7 @@ export async function createEmployeeAction(
     emergencyContactName: formData.get("emergencyContactName"),
     emergencyContactRelationship: formData.get("emergencyContactRelationship"),
     emergencyContactPhone: formData.get("emergencyContactPhone"),
+    notes: formData.get("notes"),
   });
 
   if (!parsed.success) {
@@ -72,6 +73,7 @@ function employeeInput(formData: FormData) {
     emergencyContactName: formData.get("emergencyContactName"),
     emergencyContactRelationship: formData.get("emergencyContactRelationship"),
     emergencyContactPhone: formData.get("emergencyContactPhone"),
+    notes: formData.get("notes"),
   };
 }
 

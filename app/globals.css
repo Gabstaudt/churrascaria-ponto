@@ -56,6 +56,8 @@ a { color: inherit; text-decoration: none; }
 .topbar > div { text-align: right; }
 .topbar p { margin: 0 0 .1rem; color: var(--muted); font-size: .75rem; }
 .avatar { display: grid; width: 2.65rem; height: 2.65rem; place-items: center; border-radius: 50%; background: var(--brand); color: white; font-size: .8rem; font-weight: 800; }
+.notification-bell { position: relative; display: grid; flex: none; width: 2.65rem; height: 2.65rem; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--ink); }
+.notification-bell-badge { position: absolute; top: -.2rem; right: -.2rem; display: grid; min-width: 1.2rem; height: 1.2rem; place-items: center; border-radius: 999px; background: #c0392b; padding: 0 .25rem; color: white; font-size: .62rem; font-weight: 800; }
 .dashboard-page { padding: clamp(1.5rem, 5vw, 4rem); }
 .page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 2rem; }
 .page-heading h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.25rem); letter-spacing: -.045em; }
@@ -538,6 +540,9 @@ a { color: inherit; text-decoration: none; }
 .employee-profile-field dt { display: flex; align-items: center; gap: .35rem; color: var(--muted); font-size: .72rem; }
 .employee-profile-field dd { min-width: 0; margin: 0; overflow-wrap: anywhere; font-weight: 750; }
 .employee-profile-empty { padding: 2rem 1.2rem; color: var(--muted); font-size: .84rem; text-align: center; }
+.employee-notes-text { margin: 0; padding: 1.2rem; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .88rem; line-height: 1.6; }
+.notification-actions { display: flex; flex: none; align-items: center; gap: .6rem; font-size: .78rem; color: var(--muted); }
+.notification-actions a { font-weight: 700; }
 .employee-profile-documents { display: flex; min-height: 13rem; align-items: center; justify-content: center; flex-direction: column; padding: 1.2rem; color: var(--muted); text-align: center; }
 .employee-profile-documents strong { margin-top: .6rem; color: var(--ink); }
 .employee-profile-documents p { max-width: 26rem; margin: .35rem 0 .9rem; font-size: .78rem; line-height: 1.5; }

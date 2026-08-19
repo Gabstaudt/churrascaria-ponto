@@ -38,6 +38,13 @@ export const vacations = pgTable("vacations", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (table) => [index("vacations_employee_idx").on(table.employeeId), index("vacations_period_idx").on(table.startDate, table.endDate)]);
 
+export const employeeVacationAlerts = pgTable("employee_vacation_alerts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  employeeId: uuid("employee_id").notNull().references(() => employees.id, { onDelete: "cascade" }),
+  acquisitiveDate: date("acquisitive_date", { mode: "string" }).notNull(),
+  notifiedAt: timestamp("notified_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [uniqueIndex("employee_vacation_alerts_unique").on(table.employeeId, table.acquisitiveDate)]);
+
 export const leavePeriods = pgTable("leave_periods", {
   id: uuid("id").defaultRandom().primaryKey(),
   employeeId: uuid("employee_id").notNull().references(() => employees.id, { onDelete: "restrict" }),

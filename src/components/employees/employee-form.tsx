@@ -1,6 +1,6 @@
 "use client";
 
-import { BriefcaseBusiness, LoaderCircle, PhoneCall, Save, UserRound } from "lucide-react";
+import { BriefcaseBusiness, LoaderCircle, NotebookText, PhoneCall, Save, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
 
@@ -87,6 +87,11 @@ export function EmployeeForm({ employee }: { employee?: Employee }) {
           <div className="field-group"><label htmlFor="emergencyContactRelationship">Parentesco/relação <em>Opcional</em></label><input id="emergencyContactRelationship" name="emergencyContactRelationship" defaultValue={employee?.emergencyContactRelationship ?? ""} placeholder="Ex.: Cônjuge" maxLength={80} /><FieldError errors={state.errors?.emergencyContactRelationship} /></div>
           <div className="field-group"><label htmlFor="emergencyContactPhone">Telefone <em>Opcional</em></label><input id="emergencyContactPhone" name="emergencyContactPhone" defaultValue={employee?.emergencyContactPhone ?? ""} type="tel" inputMode="tel" placeholder="(91) 99999-9999" maxLength={16} /><FieldError errors={state.errors?.emergencyContactPhone} /></div>
         </div>
+      </section>
+
+      <section className="form-section" aria-labelledby="notes-title">
+        <div className="form-section-heading"><span><NotebookText size={20} /></span><div><h2 id="notes-title">Observações</h2><p>Anotações internas visíveis apenas para a administração.</p></div></div>
+        <div className="field-group"><label htmlFor="notes">Observações <em>Opcional</em></label><textarea id="notes" name="notes" defaultValue={employee?.notes ?? ""} rows={4} maxLength={2000} placeholder="Ex.: restrições de horário, observações de desempenho, combinados internos..." /><FieldError errors={state.errors?.notes} /></div>
       </section>
 
       {state.message ? <p className="form-error" role="alert">{state.message}</p> : null}

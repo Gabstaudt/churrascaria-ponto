@@ -119,6 +119,7 @@ function auditSnapshot(employee: typeof employees.$inferSelect) {
     emergencyContactName: employee.emergencyContactName,
     emergencyContactRelationship: employee.emergencyContactRelationship,
     emergencyContactPhone: employee.emergencyContactPhone,
+    notes: employee.notes,
   };
 }
 

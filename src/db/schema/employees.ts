@@ -3,6 +3,7 @@ import {
   date,
   index,
   pgTable,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -28,6 +29,7 @@ export const employees = pgTable(
     emergencyContactPhone: varchar("emergency_contact_phone", { length: 15 }),
     status: employeeStatusEnum("status").notNull().default("ACTIVE"),
     photoUrl: varchar("photo_url", { length: 2048 }),
+    notes: text("notes"),
     isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

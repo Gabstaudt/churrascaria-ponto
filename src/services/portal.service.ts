@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { correctionRequests, dayOffSwaps, employees, managerEmployees, notifications, users } from "@/db/schema";
 import { createAvailability } from "./availability.service";
@@ -38,5 +38,6 @@ export async function reviewCorrectionRequest(id: string, managerUserId: string,
   await db.insert(notifications).values({ recipientUserId: current.requestedBy, title: decision === "APPROVED" ? "Correção aprovada" : "Correção rejeitada", message: reason, link: "/portal/solicitacoes" }); return saved;
 }
 export async function listNotifications(userId: string) { return db.select().from(notifications).where(eq(notifications.recipientUserId, userId)).orderBy(desc(notifications.createdAt)).limit(20); }
+export async function countUnreadNotifications(userId: string) { const [row] = await db.select({ value: count() }).from(notifications).where(and(eq(notifications.recipientUserId, userId), isNull(notifications.readAt))); return row?.value ?? 0; }
 export async function notifyUser(recipientUserId: string, title: string, message: string, link = "/portal/solicitacoes") { return db.insert(notifications).values({ recipientUserId, title, message, link }); }
 export async function markNotificationRead(id: string, userId: string) { return db.update(notifications).set({ readAt: new Date() }).where(and(eq(notifications.id, id), eq(notifications.recipientUserId, userId))); }

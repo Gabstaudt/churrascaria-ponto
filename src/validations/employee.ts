@@ -65,6 +65,7 @@ export const employeeCreateSchema = z.object({
   status: z.enum(employeeStatusValues).default("ACTIVE"),
   photoUrl: z.url("Informe uma URL de foto válida.").max(2048).optional(),
   isActive: z.boolean().default(true),
+  notes: optionalText(2000),
 });
 
 export type EmployeeCreateInput = z.infer<typeof employeeCreateSchema>;
@@ -81,6 +82,7 @@ export const employeeUpdateSchema = employeeCreateSchema.pick({
   emergencyContactName: true,
   emergencyContactRelationship: true,
   emergencyContactPhone: true,
+  notes: true,
 });
 
 export type EmployeeUpdateInput = z.infer<typeof employeeUpdateSchema>;

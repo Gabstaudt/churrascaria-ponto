@@ -21,3 +21,6 @@ export const availabilityCreateSchema = z.object({
 
 export const swapReviewSchema = z.object({ id: z.uuid(), decision: z.enum(["APPROVED", "REJECTED"]), reason: z.string().trim().min(5).max(500) });
 export type AvailabilityCreateInput = z.infer<typeof availabilityCreateSchema>;
+export type AvailabilityKind = AvailabilityCreateInput["kind"];
+export const availabilityKindSchema = z.enum(["DAY_OFF", "SWAP", "VACATION", "LEAVE"]);
+export const availabilityIdSchema = z.uuid("Registro inválido.");

@@ -9,7 +9,7 @@ import { minimalEmployeeName } from "@/terminal/privacy";
 import { decryptBiometricTemplate, encryptBiometricTemplate } from "./biometric-encryption.service";
 import { decideFacialMatch } from "./biometric-policy";
 import { redactAuditPayload } from "@/services/audit-redaction";
-const provider = new LocalBiometricProvider(); const VALIDATION_TTL_MS = 30_000;
+const provider = new LocalBiometricProvider(); const VALIDATION_TTL_MS = 60_000; const LOCATION_FRESHNESS_MS = 120_000;
 export class BiometricDecisionError extends Error { constructor(public code: string, message: string) { super(message); } }
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 type Writer = Database | Transaction;
@@ -35,7 +35,7 @@ export async function activeBiometricCandidateRows() {
 
 export async function identifyForPoint(input: { collectorId: string; locationValidationId: string; image: Uint8Array }) {
   const now = new Date(); const [context] = await db.select({ establishmentId: establishments.id }).from(repCollectors).innerJoin(repRegistrars, eq(repRegistrars.id, repCollectors.registrarId)).innerJoin(establishments, eq(establishments.id, repRegistrars.establishmentId)).where(eq(repCollectors.id, input.collectorId)).limit(1); if (!context) throw new BiometricDecisionError("COLLECTOR_INVALID", "Terminal inválido.");
-  const [location] = await db.select({ id: locationValidations.id }).from(locationValidations).where(and(eq(locationValidations.id, input.locationValidationId), eq(locationValidations.collectorId, input.collectorId), eq(locationValidations.establishmentId, context.establishmentId), eq(locationValidations.status, "VALID"), gt(locationValidations.validatedAt, new Date(now.getTime() - 30_000)))).limit(1); if (!location) throw new BiometricDecisionError("LOCATION_INVALID", "Localização inválida ou expirada.");
+  const [location] = await db.select({ id: locationValidations.id }).from(locationValidations).where(and(eq(locationValidations.id, input.locationValidationId), eq(locationValidations.collectorId, input.collectorId), eq(locationValidations.establishmentId, context.establishmentId), eq(locationValidations.status, "VALID"), gt(locationValidations.validatedAt, new Date(now.getTime() - LOCATION_FRESHNESS_MS)))).limit(1); if (!location) throw new BiometricDecisionError("LOCATION_INVALID", "Localização inválida ou expirada.");
   const [attempt] = await db.insert(pointRegistrationAttempts).values({ collectorId: input.collectorId, establishmentId: context.establishmentId, locationValidationId: location.id, status: "LOCATION_APPROVED", expiresAt: new Date(now.getTime() + VALIDATION_TTL_MS) }).returning();
   const rows = await activeBiometricCandidateRows();
   const candidates = rows.map((row) => ({ employeeId: row.employeeId, template: decryptBiometricTemplate(row.encryptedTemplate) })); const thresholds = policy(); const result = await provider.identify(input.image, candidates, thresholds); result.decision = decideFacialMatch({ bestScore: result.score, secondBestScore: result.secondBestScore, ...thresholds });

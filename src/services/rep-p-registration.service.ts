@@ -62,26 +62,43 @@ async function assertClockInWithinWindow(employeeId: string, occurredAt: Date) {
       "Já existe uma entrada registrada hoje sem a saída correspondente. Registre a saída antes de uma nova entrada.",
     );
   }
-  // A janela abaixo vale só para a 1ª entrada do dia (início do turno). Retornos de
-  // intervalo (2ª, 3ª... entrada do mesmo dia) não têm horário previsto para comparar.
-  if (entries.length > 0) return;
   const date = belemDate(occurredAt);
   const { rows } = await getScheduleCalendar({ start: date, end: date, employeeId });
   const row = rows[0];
   if (!row || row.situation !== "WORK" || !row.startTime) return;
-  const scheduledStart = officialDateTime(date, row.startTime).getTime();
-  const earliestAllowed = scheduledStart - EARLY_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
-  const latestAllowed = scheduledStart + LATE_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
+
+  // 1ª entrada do dia: janela em torno do início do turno. 2ª entrada (volta de
+  // intervalo): janela em torno do fim do intervalo previsto na escala. Qualquer
+  // marcação além dessas duas exige um horário previsto que a escala não define —
+  // nesse caso, bloqueia e direciona para tratamento administrativo.
+  let referenceTime: string | null;
+  let referenceLabel: string;
+  if (entries.length === 0) {
+    referenceTime = row.startTime;
+    referenceLabel = "início do turno";
+  } else if (entries.length === 2 && row.breakEndTime) {
+    referenceTime = row.breakEndTime;
+    referenceLabel = "fim do intervalo";
+  } else {
+    throw new RepPRegistrationError(
+      "UNEXPECTED_CLOCK_IN",
+      "Esta marcação não corresponde a nenhum horário previsto na escala de hoje. Procure a administração.",
+    );
+  }
+
+  const scheduledMoment = officialDateTime(date, referenceTime).getTime();
+  const earliestAllowed = scheduledMoment - EARLY_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
+  const latestAllowed = scheduledMoment + LATE_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
   if (occurredAt.getTime() < earliestAllowed) {
     throw new RepPRegistrationError(
       "TOO_EARLY_FOR_SHIFT",
-      `Ainda não é possível registrar entrada. O turno começa às ${row.startTime.slice(0, 5)}.`,
+      `Ainda não é possível registrar entrada. O ${referenceLabel} é às ${referenceTime.slice(0, 5)}.`,
     );
   }
   if (occurredAt.getTime() > latestAllowed) {
     throw new RepPRegistrationError(
       "TOO_LATE_FOR_SHIFT",
-      `Não é mais possível registrar entrada por aqui. O prazo para este turno terminou às ${belemTime(new Date(latestAllowed))}. Procure a administração.`,
+      `Não é mais possível registrar entrada por aqui. O prazo terminou às ${belemTime(new Date(latestAllowed))}. Procure a administração.`,
     );
   }
 }

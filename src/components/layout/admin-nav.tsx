@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Archive, BarChart3, CalendarCheck2, CalendarDays, CalendarRange, ClipboardCheck, FileCheck2, FileKey, FileSignature, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, Stamp, Umbrella, UsersRound } from "lucide-react";
+import { AlertTriangle, Archive, BarChart3, Building2, CalendarCheck2, CalendarDays, CalendarRange, ClipboardCheck, FileCheck2, FileKey, FileSignature, KeyRound, LayoutDashboard, MapPin, MonitorSmartphone, Scale, ScanFace, ShieldCheck, Stamp, Umbrella, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -28,6 +28,7 @@ const sections = [
   {
     title: "Terminal REP-P",
     links: [
+      { href: "/admin/estabelecimento", label: "Estabelecimento", icon: Building2, exact: false, desktopOnly: true },
       { href: "/admin/terminais", label: "Terminais", icon: MonitorSmartphone, exact: false, desktopOnly: true },
       { href: "/admin/geofence", label: "Geofence", icon: MapPin, exact: false, desktopOnly: true },
       { href: "/admin/biometria", label: "Biometria", icon: ScanFace, exact: false, desktopOnly: true },

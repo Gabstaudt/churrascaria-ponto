@@ -1,0 +1,32 @@
+import { and, eq } from "drizzle-orm";
+import { db } from "@/db";
+import { employeeIncompletePunchAlerts, notifications, users } from "@/db/schema";
+import { belemDate, officialDateTime } from "./daily-attendance-core";
+import { getDailyAttendance } from "./daily-attendance.service";
+
+// Tempo de tolerância após o fim do turno previsto antes de considerar que as marcações
+// do dia não virão mais e notificar. Evita alertar enquanto o funcionário ainda pode
+// simplesmente estar batendo o ponto com um pequeno atraso.
+const CHECK_AFTER_SHIFT_END_MINUTES = 30;
+
+async function notifyAdmins(title: string, message: string, link: string) {
+  const admins = await db.select({ id: users.id }).from(users).where(and(eq(users.role, "ADMIN"), eq(users.isActive, true)));
+  if (admins.length) await db.insert(notifications).values(admins.map(({ id }) => ({ recipientUserId: id, title, message, link })));
+}
+
+export async function notifyIncompletePunches(now = new Date()) {
+  const date = belemDate(now);
+  const report = await getDailyAttendance(date, now);
+  let notified = 0;
+  for (const row of report.rows) {
+    if (row.situation !== "WORK" || !row.startTime || !row.endTime || !row.breakStartTime || !row.breakEndTime) continue;
+    const checkFrom = officialDateTime(date, row.endTime).getTime() + CHECK_AFTER_SHIFT_END_MINUTES * 60_000;
+    if (now.getTime() < checkFrom) continue;
+    if (row.originalEntries.length >= 4) continue;
+    const [inserted] = await db.insert(employeeIncompletePunchAlerts).values({ employeeId: row.employee.id, date }).onConflictDoNothing({ target: [employeeIncompletePunchAlerts.employeeId, employeeIncompletePunchAlerts.date] }).returning({ id: employeeIncompletePunchAlerts.id });
+    if (!inserted) continue;
+    await notifyAdmins("Marcações incompletas", `${row.employee.fullName} registrou ${row.originalEntries.length} de 4 marcações previstas hoje (entrada, intervalo e saída).`, `/admin/marcacoes?date=${date}&employeeId=${row.employee.id}`);
+    notified += 1;
+  }
+  return notified;
+}

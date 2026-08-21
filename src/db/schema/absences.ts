@@ -29,3 +29,10 @@ export const employeeAbsenceAlerts = pgTable("employee_absence_alerts", {
   date: date("date", { mode: "string" }).notNull(),
   notifiedAt: timestamp("notified_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [uniqueIndex("employee_absence_alerts_unique").on(table.employeeId, table.date)]);
+
+export const employeeIncompletePunchAlerts = pgTable("employee_incomplete_punch_alerts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  employeeId: uuid("employee_id").notNull().references(() => employees.id, { onDelete: "cascade" }),
+  date: date("date", { mode: "string" }).notNull(),
+  notifiedAt: timestamp("notified_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [uniqueIndex("employee_incomplete_punch_alerts_unique").on(table.employeeId, table.date)]);

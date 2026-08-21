@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, gte, lt } from "drizzle-orm";
 import { db } from "@/db";
 import {
   employees,
@@ -27,21 +27,79 @@ import {
 import { belemDate, officialDateTime } from "./daily-attendance-core";
 import { getScheduleCalendar } from "./schedule-calendar.service";
 
-// Nenhuma entrada pode ser registrada mais que este número de minutos antes do
-// início previsto do turno. A saída não tem esse limite: atrasos para sair são
-// esperados e não devem ser bloqueados.
+// Janela de registro de entrada: de 10 minutos antes até 2 horas depois do início
+// previsto do turno. Fora dela, a entrada é bloqueada — atrasos maiores exigem
+// tratamento administrativo (não um registro tardio direto no terminal).
 const EARLY_CLOCK_IN_TOLERANCE_MINUTES = 10;
+const LATE_CLOCK_IN_TOLERANCE_MINUTES = 120;
+// A saída não pode ocorrer mais de 6 horas depois da entrada correspondente.
+const MAX_CLOCK_OUT_HOURS_AFTER_ENTRY = 6;
 
-async function assertNotTooEarly(employeeId: string, occurredAt: Date) {
+function belemTime(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Belem" }).format(date);
+}
+
+// Marcações já registradas hoje para o funcionário, em ordem cronológica. Índices pares
+// (0, 2, 4...) são entradas (início do turno ou volta de intervalo); índices ímpares são
+// saídas (início de intervalo ou fim do turno) — o mesmo par entrada/saída alternado usado
+// no restante do sistema (ver pairTimeEntries em daily-attendance-core.ts).
+async function todaysEntries(employeeId: string, occurredAt: Date) {
+  const date = belemDate(occurredAt);
+  const dayStart = officialDateTime(date, "00:00");
+  const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60_000);
+  return db
+    .select({ occurredAt: timeEntries.occurredAt })
+    .from(timeEntries)
+    .where(and(eq(timeEntries.employeeId, employeeId), gte(timeEntries.occurredAt, dayStart), lt(timeEntries.occurredAt, dayEnd)))
+    .orderBy(asc(timeEntries.occurredAt));
+}
+
+async function assertClockInWithinWindow(employeeId: string, occurredAt: Date) {
+  const entries = await todaysEntries(employeeId, occurredAt);
+  if (entries.length % 2 !== 0) {
+    throw new RepPRegistrationError(
+      "OPEN_CLOCK_IN_PENDING",
+      "Já existe uma entrada registrada hoje sem a saída correspondente. Registre a saída antes de uma nova entrada.",
+    );
+  }
+  // A janela abaixo vale só para a 1ª entrada do dia (início do turno). Retornos de
+  // intervalo (2ª, 3ª... entrada do mesmo dia) não têm horário previsto para comparar.
+  if (entries.length > 0) return;
   const date = belemDate(occurredAt);
   const { rows } = await getScheduleCalendar({ start: date, end: date, employeeId });
   const row = rows[0];
   if (!row || row.situation !== "WORK" || !row.startTime) return;
-  const earliestAllowed = officialDateTime(date, row.startTime).getTime() - EARLY_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
+  const scheduledStart = officialDateTime(date, row.startTime).getTime();
+  const earliestAllowed = scheduledStart - EARLY_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
+  const latestAllowed = scheduledStart + LATE_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
   if (occurredAt.getTime() < earliestAllowed) {
     throw new RepPRegistrationError(
       "TOO_EARLY_FOR_SHIFT",
       `Ainda não é possível registrar entrada. O turno começa às ${row.startTime.slice(0, 5)}.`,
+    );
+  }
+  if (occurredAt.getTime() > latestAllowed) {
+    throw new RepPRegistrationError(
+      "TOO_LATE_FOR_SHIFT",
+      `Não é mais possível registrar entrada por aqui. O prazo para este turno terminou às ${belemTime(new Date(latestAllowed))}. Procure a administração.`,
+    );
+  }
+}
+
+async function assertClockOutMatchesOpenEntry(employeeId: string, occurredAt: Date) {
+  const entries = await todaysEntries(employeeId, occurredAt);
+  if (entries.length % 2 === 0) {
+    throw new RepPRegistrationError(
+      "NO_OPEN_CLOCK_IN",
+      "Não é possível registrar saída sem uma entrada registrada hoje.",
+    );
+  }
+  const lastEntry = entries[entries.length - 1]!.occurredAt;
+  const limit = lastEntry.getTime() + MAX_CLOCK_OUT_HOURS_AFTER_ENTRY * 60 * 60_000;
+  if (occurredAt.getTime() > limit) {
+    throw new RepPRegistrationError(
+      "CLOCK_OUT_WINDOW_EXPIRED",
+      `A saída deve ser registrada em até ${MAX_CLOCK_OUT_HOURS_AFTER_ENTRY} horas após a entrada. Procure a administração.`,
     );
   }
 }
@@ -57,6 +115,10 @@ export type RegisterRepPPointInput = {
   contingencyEventId?: string;
   trustedOccurredAt?: Date;
   contingency?: boolean;
+  // Só verdadeiro quando um admin revisou e aprovou explicitamente uma solicitação de
+  // contingência (src/actions/contingencies.ts). Nesse caso, o admin já vouches pelo
+  // horário fora do padrão, então as janelas de entrada/saída não se aplicam.
+  bypassWindowChecks?: boolean;
 };
 
 class ConcurrentRepPReplay extends Error {}
@@ -167,7 +229,10 @@ export async function registerRepPPoint(
 
   const occurredAt = input.trustedOccurredAt ?? officialRecordedAt(clock);
 
-  if (input.eventType === "CLOCK_IN") await assertNotTooEarly(employee.id, occurredAt);
+  if (!input.bypassWindowChecks) {
+    if (input.eventType === "CLOCK_IN") await assertClockInWithinWindow(employee.id, occurredAt);
+    else await assertClockOutMatchesOpenEntry(employee.id, occurredAt);
+  }
 
   let result: RegistrationResult;
 

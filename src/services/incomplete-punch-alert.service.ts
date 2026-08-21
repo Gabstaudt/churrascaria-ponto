@@ -19,13 +19,16 @@ export async function notifyIncompletePunches(now = new Date()) {
   const report = await getDailyAttendance(date, now);
   let notified = 0;
   for (const row of report.rows) {
-    if (row.situation !== "WORK" || !row.startTime || !row.endTime || !row.breakStartTime || !row.breakEndTime) continue;
-    const checkFrom = officialDateTime(date, row.endTime).getTime() + CHECK_AFTER_SHIFT_END_MINUTES * 60_000;
+    if (row.situation !== "WORK" || !row.startTime || !row.endTime) continue;
+    const regularExpectedCount = row.breakStartTime && row.breakEndTime ? 4 : 2;
+    const expectedCount = regularExpectedCount + row.overtimePeriods.length * 2;
+    const lastEndTime = row.overtimePeriods.length ? row.overtimePeriods.reduce((latest, period) => (period.endTime > latest ? period.endTime : latest), row.endTime) : row.endTime;
+    const checkFrom = officialDateTime(date, lastEndTime).getTime() + CHECK_AFTER_SHIFT_END_MINUTES * 60_000;
     if (now.getTime() < checkFrom) continue;
-    if (row.originalEntries.length >= 4) continue;
+    if (row.originalEntries.length >= expectedCount) continue;
     const [inserted] = await db.insert(employeeIncompletePunchAlerts).values({ employeeId: row.employee.id, date }).onConflictDoNothing({ target: [employeeIncompletePunchAlerts.employeeId, employeeIncompletePunchAlerts.date] }).returning({ id: employeeIncompletePunchAlerts.id });
     if (!inserted) continue;
-    await notifyAdmins("Marcações incompletas", `${row.employee.fullName} registrou ${row.originalEntries.length} de 4 marcações previstas hoje (entrada, intervalo e saída).`, `/admin/marcacoes?date=${date}&employeeId=${row.employee.id}`);
+    await notifyAdmins("Marcações incompletas", `${row.employee.fullName} registrou ${row.originalEntries.length} de ${expectedCount} marcações previstas hoje.`, `/admin/marcacoes?date=${date}&employeeId=${row.employee.id}`);
     notified += 1;
   }
   return notified;

@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, asc, eq, gte, inArray, isNull, lte, or } from "drizzle-orm";
 import { db } from "@/db";
-import { dayOffSwaps, daysOff, employees, leavePeriods, scheduleDays, scheduleExceptions, vacations, workSchedules } from "@/db/schema";
+import { dayOffSwaps, daysOff, employees, leavePeriods, scheduleDays, scheduleExceptions, scheduledOvertimePeriods, vacations, workSchedules } from "@/db/schema";
 import type { ScheduleExceptionInput } from "@/validations/schedule-exception";
 import { resolveScheduleDay, type CalendarSituation } from "./schedule-resolution";
 import { recordAudit } from "./audit.service";
@@ -27,12 +27,13 @@ export async function getScheduleCalendar(input: { start: string; end: string; e
   const ids = people.map((person) => person.id);
   const schedulesRaw = await db.select().from(workSchedules).where(and(inArray(workSchedules.employeeId, ids), lte(workSchedules.validFrom, input.end), or(isNull(workSchedules.validTo), gte(workSchedules.validTo, input.start)))).orderBy(asc(workSchedules.validFrom));
   const daysRaw = schedulesRaw.length ? await db.select().from(scheduleDays).where(inArray(scheduleDays.workScheduleId, schedulesRaw.map((schedule) => schedule.id))) : [];
-  const [exceptions, off, swaps, vacationRows, leaves] = await Promise.all([
+  const [exceptions, off, swaps, vacationRows, leaves, overtimePeriodsRaw] = await Promise.all([
     db.select().from(scheduleExceptions).where(and(inArray(scheduleExceptions.employeeId, ids), gte(scheduleExceptions.date, input.start), lte(scheduleExceptions.date, input.end))),
     db.select().from(daysOff).where(and(inArray(daysOff.employeeId, ids), gte(daysOff.date, input.start), lte(daysOff.date, input.end))),
     db.select().from(dayOffSwaps).where(and(inArray(dayOffSwaps.employeeId, ids), eq(dayOffSwaps.status, "APPROVED"), or(and(gte(dayOffSwaps.dayOffDate, input.start), lte(dayOffSwaps.dayOffDate, input.end)), and(gte(dayOffSwaps.workDate, input.start), lte(dayOffSwaps.workDate, input.end))))),
     db.select().from(vacations).where(and(inArray(vacations.employeeId, ids), lte(vacations.startDate, input.end), gte(vacations.endDate, input.start))),
     db.select().from(leavePeriods).where(and(inArray(leavePeriods.employeeId, ids), lte(leavePeriods.startDate, input.end), gte(leavePeriods.endDate, input.start))),
+    db.select().from(scheduledOvertimePeriods).where(and(inArray(scheduledOvertimePeriods.employeeId, ids), gte(scheduledOvertimePeriods.date, input.start), lte(scheduledOvertimePeriods.date, input.end))).orderBy(asc(scheduledOvertimePeriods.sequence)),
   ]);
   const schedules = schedulesRaw.map((schedule) => ({ ...schedule, days: daysRaw.filter((day) => day.workScheduleId === schedule.id) }));
   const dates = datesBetween(input.start, input.end);
@@ -40,7 +41,7 @@ export async function getScheduleCalendar(input: { start: string; end: string; e
     dayOff: off.find((item) => item.employeeId === person.id && item.date === date),
     absence: vacationRows.find((item) => item.employeeId === person.id && item.startDate <= date && item.endDate >= date) ? { id: vacationRows.find((item) => item.employeeId === person.id && item.startDate <= date && item.endDate >= date)!.id, type: "VACATION", reason: vacationRows.find((item) => item.employeeId === person.id && item.startDate <= date && item.endDate >= date)!.reason } : leaves.find((item) => item.employeeId === person.id && item.startDate <= date && item.endDate >= date) ? { id: leaves.find((item) => item.employeeId === person.id && item.startDate <= date && item.endDate >= date)!.id, type: "LEAVE", reason: leaves.find((item) => item.employeeId === person.id && item.startDate <= date && item.endDate >= date)!.reason } : undefined,
     swap: swaps.find((item) => item.employeeId === person.id && (item.dayOffDate === date || item.workDate === date)),
-  }) }))).filter((row) => !input.situation || row.situation === input.situation);
+  }), overtimePeriods: overtimePeriodsRaw.filter((item) => item.employeeId === person.id && item.date === date).map((item) => ({ id: item.id, startTime: item.startTime, endTime: item.endTime, toleranceMinutes: item.toleranceMinutes, reason: item.reason })) }))).filter((row) => !input.situation || row.situation === input.situation);
   return { rows, employees: people, positions: [...new Set(people.map((person) => person.position))].sort((a, b) => a.localeCompare(b, "pt-BR")) };
 }
 

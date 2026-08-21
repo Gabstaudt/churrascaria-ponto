@@ -26,4 +26,28 @@ describe("calculateAttendance", () => {
     const second = calculateAttendance({ ...base, entries: [{ id: "1", occurredAt: at("08:00") }, { id: "2", occurredAt: at("17:00") }] });
     expect(first.balanceMinutes).toBeNull(); expect(second.balanceMinutes).toBe(60); expect(second.version).toBe(first.version);
   });
+  it("credita integralmente um bloco de hora extra programada somado ao dia (sábado)", () => {
+    const saturday = { ...base, startTime: "07:30:00", endTime: "11:30:00", breakStartTime: null, breakEndTime: null, overtimePeriods: [{ startTime: "12:30:00", endTime: "16:30:00" }] };
+    const result = calculateAttendance({ ...saturday, entries: [
+      { id: "1", occurredAt: at("07:30") },
+      { id: "2", occurredAt: at("11:30") },
+      { id: "3", occurredAt: at("12:30") },
+      { id: "4", occurredAt: at("16:30") },
+    ] });
+    expect(result.plannedMinutes).toBe(240);
+    expect(result.scheduledOvertimeMinutes).toBe(240);
+    expect(result.balanceMinutes).toBe(240);
+    expect(result.overtimeMinutes).toBe(240);
+    expect(result.deficitMinutes).toBe(0);
+    expect(result.status).toBe("COMPLETE");
+  });
+  it("ignora marcações de hora extra que não correspondem a nenhum período programado", () => {
+    const saturday = { ...base, startTime: "07:30:00", endTime: "11:30:00", breakStartTime: null, breakEndTime: null, overtimePeriods: [] as { startTime: string; endTime: string }[] };
+    const result = calculateAttendance({ ...saturday, entries: [
+      { id: "1", occurredAt: at("07:30") },
+      { id: "2", occurredAt: at("11:30") },
+    ] });
+    expect(result.scheduledOvertimeMinutes).toBe(0);
+    expect(result.balanceMinutes).toBe(0);
+  });
 });

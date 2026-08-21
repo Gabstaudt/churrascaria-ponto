@@ -68,17 +68,33 @@ async function assertClockInWithinWindow(employeeId: string, occurredAt: Date) {
   if (!row || row.situation !== "WORK" || !row.startTime) return;
 
   // 1ª entrada do dia: janela em torno do início do turno. 2ª entrada (volta de
-  // intervalo): janela em torno do fim do intervalo previsto na escala. Qualquer
-  // marcação além dessas duas exige um horário previsto que a escala não define —
-  // nesse caso, bloqueia e direciona para tratamento administrativo.
-  let referenceTime: string | null;
+  // intervalo): janela em torno do fim do intervalo previsto na escala. Marcações
+  // além dessas duas correspondem a blocos de hora extra programada (na ordem em
+  // que foram cadastrados) — cada bloco tem sua própria janela e tolerância.
+  // Qualquer marcação que não corresponda a nenhum horário previsto bloqueia e
+  // direciona para tratamento administrativo.
+  const regularExpectedCount = row.breakEndTime ? 4 : 2;
+  let referenceTime: string;
   let referenceLabel: string;
+  let toleranceMinutes = EARLY_CLOCK_IN_TOLERANCE_MINUTES;
   if (entries.length === 0) {
     referenceTime = row.startTime;
     referenceLabel = "início do turno";
   } else if (entries.length === 2 && row.breakEndTime) {
     referenceTime = row.breakEndTime;
     referenceLabel = "fim do intervalo";
+  } else if (entries.length >= regularExpectedCount && (entries.length - regularExpectedCount) % 2 === 0) {
+    const overtimeIndex = (entries.length - regularExpectedCount) / 2;
+    const overtimePeriod = row.overtimePeriods[overtimeIndex];
+    if (!overtimePeriod) {
+      throw new RepPRegistrationError(
+        "UNEXPECTED_CLOCK_IN",
+        "Esta marcação não corresponde a nenhum horário previsto na escala de hoje. Procure a administração.",
+      );
+    }
+    referenceTime = overtimePeriod.startTime;
+    referenceLabel = "início do período de hora extra";
+    toleranceMinutes = overtimePeriod.toleranceMinutes;
   } else {
     throw new RepPRegistrationError(
       "UNEXPECTED_CLOCK_IN",
@@ -87,7 +103,7 @@ async function assertClockInWithinWindow(employeeId: string, occurredAt: Date) {
   }
 
   const scheduledMoment = officialDateTime(date, referenceTime).getTime();
-  const earliestAllowed = scheduledMoment - EARLY_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
+  const earliestAllowed = scheduledMoment - toleranceMinutes * 60_000;
   const latestAllowed = scheduledMoment + LATE_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
   if (occurredAt.getTime() < earliestAllowed) {
     throw new RepPRegistrationError(

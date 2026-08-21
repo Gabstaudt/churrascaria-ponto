@@ -86,7 +86,7 @@ a { color: inherit; text-decoration: none; }
 .data-panel > header p { margin: .2rem 0 0; color: var(--muted); font-size: .72rem; }
 .data-panel > header > span { flex: none; color: var(--muted); font-size: .82rem; font-weight: 700; }
 .data-panel > header > svg { flex: none; color: var(--brand); }
-.table-summary { padding: .9rem 1rem; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .86rem; }
+.table-summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .86rem; }
 .table-summary strong { color: var(--ink); }
 .table-scroll { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
@@ -833,6 +833,13 @@ a { color: inherit; text-decoration: none; }
 .report-table article > div { display: grid; min-width: 0; gap: .18rem; }
 .report-table article small { overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
 .report-table article strong { overflow: hidden; font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
+.employee-totals-head, .employee-totals-table article { display: grid; grid-template-columns: minmax(12rem, 1.3fr) repeat(4, minmax(6rem, .8fr)); align-items: center; gap: 1rem; }
+.employee-totals-head { padding: .65rem 1.1rem; background: #f7f9f7; color: var(--muted); font-size: .65rem; font-weight: 800; text-transform: uppercase; }
+.employee-totals-table article { min-width: 0; padding: .85rem 1.1rem; border-top: 1px solid #edf0ed; font-size: .78rem; font-weight: 700; }
+.employee-totals-table article div { display: grid; min-width: 0; gap: .18rem; font-weight: 400; }
+.employee-totals-table article small { overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
+.employee-totals-table article strong { overflow: hidden; font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 900px) { .employee-totals-head { display: none; } .employee-totals-table article { grid-template-columns: 1fr; gap: .3rem; } }
 .report-row-metrics { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem !important; }
 .report-row-metrics > span { display: grid; min-width: 0; gap: .15rem; padding-left: .55rem; border-left: 1px solid #edf0ed; }
 .report-row-metrics > span:first-child { padding-left: 0; border-left: 0; }

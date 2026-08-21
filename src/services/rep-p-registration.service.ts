@@ -24,6 +24,27 @@ import {
   repPRequestFingerprint,
   RepPRegistrationError,
 } from "@/rep-p/registration-core";
+import { belemDate, officialDateTime } from "./daily-attendance-core";
+import { getScheduleCalendar } from "./schedule-calendar.service";
+
+// Nenhuma entrada pode ser registrada mais que este número de minutos antes do
+// início previsto do turno. A saída não tem esse limite: atrasos para sair são
+// esperados e não devem ser bloqueados.
+const EARLY_CLOCK_IN_TOLERANCE_MINUTES = 10;
+
+async function assertNotTooEarly(employeeId: string, occurredAt: Date) {
+  const date = belemDate(occurredAt);
+  const { rows } = await getScheduleCalendar({ start: date, end: date, employeeId });
+  const row = rows[0];
+  if (!row || row.situation !== "WORK" || !row.startTime) return;
+  const earliestAllowed = officialDateTime(date, row.startTime).getTime() - EARLY_CLOCK_IN_TOLERANCE_MINUTES * 60_000;
+  if (occurredAt.getTime() < earliestAllowed) {
+    throw new RepPRegistrationError(
+      "TOO_EARLY_FOR_SHIFT",
+      `Ainda não é possível registrar entrada. O turno começa às ${row.startTime.slice(0, 5)}.`,
+    );
+  }
+}
 
 export type RegisterRepPPointInput = {
   employeeId: string;
@@ -145,6 +166,9 @@ export async function registerRepPPoint(
   });
 
   const occurredAt = input.trustedOccurredAt ?? officialRecordedAt(clock);
+
+  if (input.eventType === "CLOCK_IN") await assertNotTooEarly(employee.id, occurredAt);
+
   let result: RegistrationResult;
 
   try {

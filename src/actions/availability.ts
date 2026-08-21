@@ -10,7 +10,7 @@ export type AvailabilityFormState = { message?: string; errors?: string[] };
 export async function createAvailabilityAction(_state: AvailabilityFormState, formData: FormData): Promise<AvailabilityFormState> {
   const session = await requireAdmin();
   const optional = (key: string) => String(formData.get(key) ?? "").trim() || undefined;
-  const parsed = availabilityCreateSchema.safeParse({ kind: formData.get("kind"), employeeId: formData.get("employeeId"), date: optional("date"), startDate: optional("startDate"), endDate: optional("endDate"), workDate: optional("workDate"), leaveType: optional("leaveType"), reason: formData.get("reason") });
+  const parsed = availabilityCreateSchema.safeParse({ kind: formData.get("kind"), employeeId: formData.get("employeeId"), date: optional("date"), startDate: optional("startDate"), endDate: optional("endDate"), workDate: optional("workDate"), leaveType: optional("leaveType"), reason: formData.get("reason"), timeBankDebitMinutes: optional("timeBankDebitMinutes") });
   if (!parsed.success) return { message: "Revise os dados informados.", errors: parsed.error.issues.map((issue) => issue.message) };
   try { await createAvailability(parsed.data, session.user.id); }
   catch (error) { if (error instanceof AvailabilityConflictError) return { message: error.message }; return { message: "Não foi possível salvar o registro." }; }

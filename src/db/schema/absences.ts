@@ -22,3 +22,10 @@ export const absenceJustifications = pgTable("absence_justifications", {
   approvedBy: uuid("approved_by").notNull().references(() => users.id, { onDelete: "restrict" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [index("absence_justifications_absence_idx").on(table.absenceId), index("absence_justifications_created_idx").on(table.createdAt)]);
+
+export const employeeAbsenceAlerts = pgTable("employee_absence_alerts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  employeeId: uuid("employee_id").notNull().references(() => employees.id, { onDelete: "cascade" }),
+  date: date("date", { mode: "string" }).notNull(),
+  notifiedAt: timestamp("notified_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [uniqueIndex("employee_absence_alerts_unique").on(table.employeeId, table.date)]);

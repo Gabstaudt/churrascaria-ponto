@@ -6,6 +6,7 @@ import { dayOffSwaps, daysOff, employees, leavePeriods, vacations } from "@/db/s
 import type { AvailabilityCreateInput, AvailabilityKind } from "@/validations/availability";
 import { recordAudit } from "./audit.service";
 import { assertPeriodRangeMutable } from "./period-lock.service";
+import { createManualTimeBankAdjustment } from "./time-bank.service";
 
 export class AvailabilityConflictError extends Error {
   constructor(message = "Já existe férias ou afastamento nesse período para o funcionário.") { super(message); this.name = "AvailabilityConflictError"; }
@@ -32,7 +33,7 @@ async function hasPeriodConflict(tx: Parameters<Parameters<typeof db.transaction
 }
 
 export async function createAvailability(input: AvailabilityCreateInput, performedBy: string) {
-  return db.transaction(async (tx) => {
+  const saved = await db.transaction(async (tx) => {
     const dates = input.kind === "DAY_OFF" ? [input.date!, input.date!] : input.kind === "SWAP" ? [input.date! < input.workDate! ? input.date! : input.workDate!, input.date! > input.workDate! ? input.date! : input.workDate!] : [input.startDate!, input.endDate!];
     await assertPeriodRangeMutable(tx, dates[0], dates[1]);
     if (input.kind === "DAY_OFF") {
@@ -40,7 +41,7 @@ export async function createAvailability(input: AvailabilityCreateInput, perform
       if (!existing && await hasPeriodConflict(tx, input.employeeId, input.date!, input.date!)) throw new AvailabilityConflictError("A folga conflita com outro período ou troca aprovada.");
       const [saved] = existing ? await tx.update(daysOff).set({ reason: input.reason, authorizedBy: performedBy }).where(eq(daysOff.id, existing.id)).returning() : await tx.insert(daysOff).values({ employeeId: input.employeeId, date: input.date!, reason: input.reason, authorizedBy: performedBy }).returning();
       await recordAudit(tx, { action: existing ? "UPDATE_DAY_OFF" : "CREATE_DAY_OFF", entity: "DayOff", entityId: saved!.id, performedBy, before: existing ?? null, after: saved!, reason: input.reason });
-      return saved;
+      return { saved, isNewDayOff: !existing };
     }
     if (input.kind === "SWAP") {
       const [saved] = await tx.insert(dayOffSwaps).values({ employeeId: input.employeeId, dayOffDate: input.date!, workDate: input.workDate!, reason: input.reason, requestedBy: performedBy }).returning();
@@ -57,6 +58,12 @@ export async function createAvailability(input: AvailabilityCreateInput, perform
     await recordAudit(tx, { action: "CREATE_LEAVE_PERIOD", entity: "LeavePeriod", entityId: saved!.id, performedBy, after: saved!, reason: input.reason });
     return saved;
   });
+  if (input.kind === "DAY_OFF") {
+    const { saved: dayOff, isNewDayOff } = saved as { saved: typeof daysOff.$inferSelect; isNewDayOff: boolean };
+    if (isNewDayOff && input.timeBankDebitMinutes) await createManualTimeBankAdjustment({ employeeId: input.employeeId, date: input.date!, amountMinutes: -input.timeBankDebitMinutes, reason: `Folga compensatória — abate de banco de horas referente a ${input.date}.` }, performedBy);
+    return dayOff;
+  }
+  return saved;
 }
 
 export async function reviewDayOffSwap(id: string, decision: "APPROVED" | "REJECTED", reason: string, performedBy: string) {

@@ -12,7 +12,7 @@ describe("pairTimeEntries", () => {
 });
 describe("resolveDailyStatus", () => {
   it("identifica presença", () => expect(resolveDailyStatus({ date: "2026-08-13", situation: "WORK", startTime: "08:00", toleranceMinutes: 10, entries: [entry("1", "08:05"), entry("2", "12:00")], now: entry("now", "18:00").occurredAt })).toBe("PRESENT"));
-  it("identifica atraso após a tolerância", () => expect(resolveDailyStatus({ date: "2026-08-13", situation: "WORK", startTime: "08:00", toleranceMinutes: 10, entries: [entry("1", "08:11"), entry("2", "12:00")], now: entry("now", "18:00").occurredAt })).toBe("LATE"));
+  it("identifica atraso após a tolerância", () => expect(resolveDailyStatus({ date: "2026-08-13", situation: "WORK", startTime: "08:00", toleranceMinutes: 10, entries: [entry("1", "08:16"), entry("2", "12:00")], now: entry("now", "18:00").occurredAt })).toBe("LATE"));
   it("identifica marcação incompleta", () => expect(resolveDailyStatus({ date: "2026-08-13", situation: "WORK", startTime: "08:00", toleranceMinutes: 10, entries: [entry("1", "08:00")], now: entry("now", "18:00").occurredAt })).toBe("INCOMPLETE"));
   it("não declara falta definitiva sem tratamento", () => expect(resolveDailyStatus({ date: "2026-08-12", situation: "WORK", startTime: "08:00", toleranceMinutes: 10, entries: [], now: entry("now", "18:00").occurredAt })).toBe("POSSIBLE_ABSENCE"));
   it("mantém dia futuro como previsto", () => expect(resolveDailyStatus({ date: "2026-08-14", situation: "WORK", startTime: "08:00", toleranceMinutes: 10, entries: [], now: entry("now", "18:00").occurredAt })).toBe("EXPECTED"));

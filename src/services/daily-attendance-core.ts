@@ -16,13 +16,18 @@ export function pairTimeEntries(entries: EntryLike[]) {
   return pairs;
 }
 
+// Limite fixo de tolerância para virar "possível ausência"/"atrasado" na visão diária,
+// independente da tolerância configurada por escala (usada só para o cálculo de horas).
+export const ABSENCE_TOLERANCE_MINUTES = 15;
+export const CONFIRMED_ABSENCE_MINUTES = 30;
+
 export function resolveDailyStatus(input: { date: string; situation: CalendarSituation; startTime: string | null; toleranceMinutes: number; entries: EntryLike[]; now: Date }) {
   if (input.situation !== "WORK") return input.situation as Extract<DailyStatus, "OFF" | "VACATION" | "LEAVE" | "NO_SCHEDULE">;
   const pairs = pairTimeEntries(input.entries);
   if (input.entries.length) {
     if (input.entries.length % 2 !== 0) return "INCOMPLETE" as const;
     if (input.startTime) {
-      const limit = officialDateTime(input.date, input.startTime).getTime() + input.toleranceMinutes * 60_000;
+      const limit = officialDateTime(input.date, input.startTime).getTime() + ABSENCE_TOLERANCE_MINUTES * 60_000;
       if (pairs[0]!.entry.occurredAt.getTime() > limit) return "LATE" as const;
     }
     return "PRESENT" as const;
@@ -30,6 +35,6 @@ export function resolveDailyStatus(input: { date: string; situation: CalendarSit
   const today = belemDate(input.now);
   if (input.date > today) return "EXPECTED" as const;
   if (input.date < today) return "POSSIBLE_ABSENCE" as const;
-  if (!input.startTime || input.now.getTime() <= officialDateTime(input.date, input.startTime).getTime() + input.toleranceMinutes * 60_000) return "EXPECTED" as const;
+  if (!input.startTime || input.now.getTime() <= officialDateTime(input.date, input.startTime).getTime() + ABSENCE_TOLERANCE_MINUTES * 60_000) return "EXPECTED" as const;
   return "POSSIBLE_ABSENCE" as const;
 }

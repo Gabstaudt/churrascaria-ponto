@@ -10,6 +10,7 @@ export const availabilityCreateSchema = z.object({
   workDate: z.string().regex(isoDate).optional(),
   leaveType: z.enum(["MEDICAL", "PERSONAL", "LEGAL", "OTHER"]).optional(),
   reason: z.string().trim().min(5, "Informe um motivo com pelo menos 5 caracteres.").max(500),
+  timeBankDebitMinutes: z.coerce.number().int("Informe minutos inteiros.").min(1, "Informe um valor maior que zero.").max(1440, "O valor não pode passar de 1440 minutos (24h).").optional(),
 }).superRefine((value, context) => {
   if ((value.kind === "DAY_OFF" || value.kind === "SWAP") && !value.date) context.addIssue({ code: "custom", message: "Informe a data da folga.", path: ["date"] });
   if (value.kind === "SWAP" && !value.workDate) context.addIssue({ code: "custom", message: "Informe a data compensada de trabalho.", path: ["workDate"] });

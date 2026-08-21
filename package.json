@@ -30,7 +30,8 @@
     "receipts:reconcile": "tsx scripts/reconcile-point-receipts.ts",
     "afd:validate": "tsx scripts/validate-afd.ts",
     "biometrics:purge": "tsx scripts/purge-biometric-data.ts",
-    "vacation:monitor": "tsx scripts/monitor-vacation-acquisitions.ts"
+    "vacation:monitor": "tsx scripts/monitor-vacation-acquisitions.ts",
+    "absences:monitor": "tsx scripts/monitor-absences.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1109.0",
